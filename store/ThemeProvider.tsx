@@ -1,10 +1,12 @@
 "use client";
 import { createContext, useState, useContext, useEffect } from "react";
+
 import { THEMES } from "../constants/theme";
 
+type Theme = (typeof THEMES)[number]["value"];
 interface ThemeContextProps {
-  theme: string;
-  toggleTheme: (theme: keyof typeof THEMES) => void;
+  theme: Theme;
+  setTheme: (theme: Theme) => void;
 }
 
 export const ThemeContext = createContext<ThemeContextProps | undefined>(
@@ -13,10 +15,12 @@ export const ThemeContext = createContext<ThemeContextProps | undefined>(
 export const useTheme = () => useContext(ThemeContext);
 
 function getTheme() {
+  const themes = THEMES.map((theme) => theme.value);
+
   if (typeof window !== "undefined" && window.localStorage) {
     const storedPrefs = window.localStorage.getItem("color-theme");
-    if (typeof storedPrefs === "string" && storedPrefs in THEMES) {
-      return storedPrefs;
+    if (typeof storedPrefs === "string" && storedPrefs in themes) {
+      return storedPrefs as Theme;
     }
 
     const userMedia = window.matchMedia("(prefers-color-scheme: dark)");
@@ -30,27 +34,24 @@ function getTheme() {
 }
 
 export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
-  const [theme, setTheme] = useState(getTheme);
+  const [theme, setTheme] = useState<Theme>(getTheme);
 
-  const toggleTheme: ThemeContextProps["toggleTheme"] = (theme) => {
-    if (theme === "system") {
-      localStorage.removeItem("color-theme");
-    } else {
-      localStorage.setItem("color-theme", theme);
-    }
+  const setMode: ThemeContextProps["setTheme"] = (theme) => {
+    localStorage.setItem("color-theme", theme);
 
     setTheme(theme);
   };
 
   useEffect(() => {
     document.body.dataset.theme = theme;
-    for (const key of Object.keys(THEMES)) {
+    const themes = THEMES.map((theme) => theme.value);
+    for (const key of themes) {
       document.body.classList.toggle(`${key}`, key === theme);
     }
   }, [theme]);
 
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+    <ThemeContext.Provider value={{ theme, setTheme: setMode }}>
       {children}
     </ThemeContext.Provider>
   );
