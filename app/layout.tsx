@@ -13,7 +13,7 @@ const inter = Inter({
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
   weight: "variable",
-  variable: "--font-space-grotesk",
+  variable: "--font-spaceGrotesk",
 });
 
 export const metadata: Metadata = {
@@ -36,10 +36,11 @@ export default function RootLayout({
           },
         }}
       >
-        <html lang="en">
-          <body className={`${inter.variable} ${spaceGrotesk.variable}`}>
-            {children}
-          </body>
+        <html
+          lang="en"
+          className={`${inter.variable} ${spaceGrotesk.variable}`}
+        >
+          <body>{children}</body>
         </html>
       </ClerkProvider>
     </ThemeProvider>
