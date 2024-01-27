@@ -19,7 +19,10 @@ function getTheme() {
 
   if (typeof window !== "undefined" && window.localStorage) {
     const storedPrefs = window.localStorage.getItem("color-theme");
-    if (typeof storedPrefs === "string" && storedPrefs in themes) {
+    if (
+      typeof storedPrefs === "string" &&
+      themes.includes(storedPrefs as any)
+    ) {
       return storedPrefs as Theme;
     }
 
