@@ -1,6 +1,10 @@
+import Link from "next/link";
+
+import Filters from "@/components/shared/filter/Filters";
+import TagFilter from "@/components/shared/filter/TagFilter";
 import LocalSearch from "@/components/shared/search/LocalSearch";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
+import { HomePageFilters } from "@/constants/filters";
 
 export default function Home() {
   return (
@@ -22,7 +26,17 @@ export default function Home() {
           img="/assets/icons/search.svg"
           imgSide="left"
         />
+        <Filters
+          filters={HomePageFilters}
+          className="min-h-14 sm:min-w-[170px]"
+          wrapperClassName="max-md:flex hidden"
+        />
       </div>
+
+      <TagFilter
+        filters={HomePageFilters}
+        wrapperClassName="mt-10 flex md:flex"
+      />
     </>
   );
 }
