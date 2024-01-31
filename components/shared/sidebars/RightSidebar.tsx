@@ -1,23 +1,25 @@
-import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
 import TagBadge from "../TagBadge";
 
 const RightSideBar = () => {
   const hotQuestions = [
-    { _id: 1, title: "How to use Next.js with Tailwind CSS" },
-    { _id: 2, title: "Case insensitive 'Contains[X]' in C#" },
-    { _id: 3, title: "Django best practices for data migrations and testing" },
-    { _id: 4, title: "Migration from AngularJS to Angular 12" },
-    { _id: 5, title: "How to use Prisma Client in a REST API" },
+    { _id: "1", title: "How to use Next.js with Tailwind CSS" },
+    { _id: "2", title: "Case insensitive 'Contains[X]' in C#" },
+    {
+      _id: "3",
+      title: "Django best practices for data migrations and testing",
+    },
+    { _id: "4", title: "Migration from AngularJS to Angular 12" },
+    { _id: "5", title: "How to use Prisma Client in a REST API" },
   ];
 
   const popularTags = [
-    { _id: 1, name: "javascript", totalQuestions: 123 },
-    { _id: 2, name: "react", totalQuestions: 123 },
-    { _id: 3, name: "typescript", totalQuestions: 123 },
-    { _id: 4, name: "nextjs", totalQuestions: 123 },
-    { _id: 5, name: "prisma", totalQuestions: 123 },
+    { _id: "1", name: "javascript", totalQuestions: 123 },
+    { _id: "2", name: "react", totalQuestions: 123 },
+    { _id: "3", name: "typescript", totalQuestions: 123 },
+    { _id: "4", name: "nextjs", totalQuestions: 123 },
+    { _id: "5", name: "prisma", totalQuestions: 123 },
   ];
 
   return (
