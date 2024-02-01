@@ -5,6 +5,62 @@ import TagFilter from "@/components/shared/filter/TagFilter";
 import LocalSearch from "@/components/shared/search/LocalSearch";
 import { Button } from "@/components/ui/button";
 import { HomePageFilters } from "@/constants/filters";
+import NoResultsFound from "@/components/shared/NoResultsFound";
+import QuestionCard from "@/components/shared/questions/QuestionCard";
+
+const questions = [
+  {
+    _id: "1",
+    title: "How to implement authentication in a Next.js application?",
+    tags: [
+      { _id: "1", name: "Next.js" },
+      { _id: "2", name: "Authentication" },
+    ],
+    answers: [],
+    views: 56,
+    upvotes: 10,
+    author: { _id: "1", name: "John Doe", picture: "/avatars/john-doe.jpg" },
+    created_at: new Date("2023-01-15"),
+  },
+  {
+    _id: "2",
+    title:
+      "What is the best practice for handling state in React applications?",
+    tags: [
+      { _id: "3", name: "React" },
+      { _id: "4", name: "State Management" },
+    ],
+    answers: [],
+    views: 1002,
+    upvotes: 25,
+    author: {
+      _id: "2",
+      name: "Jane Smith",
+      picture: "/avatars/jane-smith.jpg",
+    },
+
+    created_at: new Date("2023-02-22"),
+  },
+  {
+    _id: "3",
+    title: "How to deploy a Node.js application to AWS Lambda?",
+    tags: [
+      { _id: "5", name: "Node.js" },
+      { _id: "6", name: "AWS Lambda" },
+    ],
+    answers: [],
+    views: 38,
+    upvotes: 8,
+    author: {
+      _id: "3",
+      name: "Alice Johnson",
+      picture: "/avatars/alice-johnson.jpg",
+    },
+
+    created_at: new Date("2023-03-10"),
+  },
+  // Add more example questions as needed
+];
 
 export default function Home() {
   return (
@@ -37,6 +93,16 @@ export default function Home() {
         filters={HomePageFilters}
         wrapperClassName="mt-10 flex md:flex"
       />
+
+      <div className="mt-10 flex w-full flex-col gap-6 ">
+        {questions.length > 2 ? (
+          questions.map((question) => (
+            <QuestionCard key={question._id} {...question} />
+          ))
+        ) : (
+          <NoResultsFound />
+        )}
+      </div>
     </>
   );
 }
