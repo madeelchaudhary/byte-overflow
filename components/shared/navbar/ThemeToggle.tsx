@@ -31,7 +31,7 @@ function ThemeToggle() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent
-        className="absolute -right-4 mt-3 min-w-28 rounded border py-2 dark:border-dark-400 dark:bg-dark-300 dark:text-light-900"
+        className="absolute -right-4 mt-3 min-w-28 rounded border bg-light-900 py-2 dark:border-dark-400 dark:bg-dark-300 dark:text-light-900"
         align="end"
       >
         {THEMES.map((theme) => (
