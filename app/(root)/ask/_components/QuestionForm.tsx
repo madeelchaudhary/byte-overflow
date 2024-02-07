@@ -19,6 +19,7 @@ import QuestionEditor from "./QuestionEditor";
 import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
 import { useState } from "react";
+import { createQuestion } from "@/lib/actions/questions";
 
 interface QuestionFormProps {
   type?: "ask" | "edit";
@@ -42,8 +43,14 @@ const QuestionForm = ({ type = "ask" }: QuestionFormProps) => {
     },
   });
 
-  function onSubmit(data: z.infer<typeof QuestionSchema>) {
-    console.log(data);
+  async function onSubmit(data: z.infer<typeof QuestionSchema>) {
+    try {
+      setIsSubmitting(true);
+      createQuestion(data);
+    } catch (error) {
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   function handleKeyDown(
@@ -173,7 +180,11 @@ const QuestionForm = ({ type = "ask" }: QuestionFormProps) => {
             </FormItem>
           )}
         />
-        <Button type="submit" className="primary-gradient w-fit text-light-900">
+        <Button
+          type="submit"
+          className="primary-gradient w-fit text-light-900"
+          disabled={isSubmitting}
+        >
           {type === "ask" && (!isSubmitting ? "Ask Question" : "Asking...")}
           {type === "edit" && (!isSubmitting ? "Edit Question" : "Editing...")}
         </Button>
