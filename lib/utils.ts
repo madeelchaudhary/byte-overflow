@@ -5,8 +5,9 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function humanizeDate(date: Date) {
+export function humanizeDate(date: Date | string | number) {
   const now = new Date();
+  date = typeof date === "object" ? date : new Date(date);
   const diff = now.getTime() - date.getTime();
 
   const seconds = Math.floor(diff / 1000);
