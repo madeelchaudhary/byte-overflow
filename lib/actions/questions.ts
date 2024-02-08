@@ -1,25 +1,29 @@
 "use server";
 
-import { connect } from "@/db/mongoose";
-import { Question } from "@/db/question.model";
-import { Tag } from "@/db/tag.model";
-import { User } from "@/db/user.model";
+import dbConnect from "@/lib/dbConnect";
+import Question from "@/db/question.model";
+import Tag from "@/db/tag.model";
+import User from "@/db/user.model";
 import { auth } from "@clerk/nextjs";
-import APIError from "../api-error";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import * as z from "zod";
+import APIError from "../api-error";
 import { QuestionSchema } from "../validations";
 
-export async function createQuestion(params: any) {
-  try {
-    await connect();
+type CreateQuestionParams = z.infer<typeof QuestionSchema>;
 
-    const { title, description, tags } = params;
+export async function createQuestion(params: CreateQuestionParams) {
+  try {
+    await dbConnect();
+
     const { success } = QuestionSchema.safeParse(params);
 
     if (!success) {
       throw new APIError("Invalid input", 400);
     }
+
+    const { title, description, tags } = params;
 
     const { userId } = auth();
 
