@@ -25,6 +25,11 @@ export const Sidebar_Links = [
     image: "/assets/icons/tag.svg",
   },
   {
+    title: "Profile",
+    href: "/profile",
+    image: "/assets/icons/user.svg",
+  },
+  {
     title: "Ask a Question",
     href: "/ask",
     image: "/assets/icons/question.svg",
