@@ -15,7 +15,7 @@ export const getQuestions = async ({
   pageSize = 10,
   search = "",
 }: GetQuestionParams) => {
-  dbConnect();
+  await dbConnect();
 
   const result = await Question.find()
     .populate("tags", undefined, Tag)
