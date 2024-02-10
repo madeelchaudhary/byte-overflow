@@ -3,6 +3,7 @@
 import Question from "@/db/question.model";
 import User from "@/db/user.model";
 import APIError from "../api-error";
+import dbConnect from "../dbConnect";
 
 interface CreateUserParams {
   clerkId: string;
@@ -27,6 +28,8 @@ export const createUser = async ({
   firstName,
   lastName,
 }: CreateUserParams) => {
+  await dbConnect();
+
   const user = new User({
     clerkId: clerkId,
     username: username,
@@ -38,6 +41,8 @@ export const createUser = async ({
   });
 
   await user.save();
+
+  return user;
 };
 
 export const updateUser = async ({
@@ -48,6 +53,8 @@ export const updateUser = async ({
   firstName,
   lastName,
 }: UpdateUserParams) => {
+  await dbConnect();
+
   const user = await User.findOne({ clerkId: clerkId });
 
   if (!user) {
@@ -65,6 +72,8 @@ export const updateUser = async ({
 };
 
 export const deleteUser = async ({ clerkId }: DeleteUserParams) => {
+  await dbConnect();
+
   const user = await User.findOne({
     clerkId: clerkId,
   });
