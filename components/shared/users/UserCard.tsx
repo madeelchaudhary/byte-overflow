@@ -20,25 +20,28 @@ const UserCard = async ({ clerkId, profile, username }: Props) => {
   const tags = await getUserRelatedTags({ userId: clerkId });
 
   return (
-    <Link
-      href={`/profile/${clerkId}`}
-      className="shadow-light100_darknone w-full max-xs:min-w-full xs:w-[260px] "
-    >
+    <div className="shadow-light100_darknone w-full max-xs:min-w-full xs:w-[260px] ">
       <div className="background-light900_dark200 light-border flex w-full flex-col items-center justify-center gap-3 rounded-2xl border p-8">
-        <Image
-          src={profile.avatar}
-          alt={profile.name}
-          width={100}
-          height={100}
-          className="rounded-full"
-        />
+        <Link href={`/profile/${clerkId}`}>
+          <Image
+            src={profile.avatar}
+            alt={profile.name}
+            width={100}
+            height={100}
+            className="rounded-full"
+          />
+        </Link>
         <div className="mt-4 text-center">
-          <h3 className="h3-bold text-dark200_light900 line-clamp-1">
-            {profile.name}
-          </h3>
-          <p className="body-regular text-dark500_light500 mt-2 line-clamp-1">
-            @{username}
-          </p>
+          <Link href={`/profile/${clerkId}`}>
+            <h3 className="h3-bold text-dark200_light900 line-clamp-1">
+              {profile.name}
+            </h3>
+          </Link>
+          <Link href={`/profile/${clerkId}`}>
+            <p className="body-regular text-dark500_light500 mt-2 line-clamp-1">
+              @{username}
+            </p>
+          </Link>
         </div>
 
         <div className="mt-5">
@@ -53,7 +56,7 @@ const UserCard = async ({ clerkId, profile, username }: Props) => {
           )}
         </div>
       </div>
-    </Link>
+    </div>
   );
 };
 
