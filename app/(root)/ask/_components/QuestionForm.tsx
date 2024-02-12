@@ -1,8 +1,10 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm, ControllerRenderProps } from "react-hook-form";
+import { ControllerRenderProps, useForm } from "react-hook-form";
 import * as z from "zod";
 
+import MarkDownEditor from "@/components/shared/MardownEditor";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -14,12 +16,10 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { createQuestion } from "@/lib/actions/questions";
 import { QuestionSchema } from "@/lib/validations";
-import QuestionEditor from "./QuestionEditor";
-import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
 import { useState } from "react";
-import { createQuestion } from "@/lib/actions/questions";
 
 interface QuestionFormProps {
   type?: "ask" | "edit";
@@ -122,7 +122,7 @@ const QuestionForm = ({ type = "ask" }: QuestionFormProps) => {
                 <span className="text-primary-500">*</span>
               </FormLabel>
               <FormControl className="mt-3.5">
-                <QuestionEditor field={field} />
+                <MarkDownEditor field={field} />
               </FormControl>
               <FormDescription className="body-regular mt-2.5 text-light-500">
                 Include all the information someone would need to answer your
