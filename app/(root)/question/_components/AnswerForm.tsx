@@ -15,9 +15,12 @@ import {
 import { AnswerSchema } from "@/lib/validations";
 import { useState } from "react";
 import Image from "next/image";
+import { useParams } from "next/navigation";
+import { createAnswer } from "@/lib/actions/answers";
 
 const AnswerForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const params = useParams<{ id: string }>();
 
   const form = useForm<z.infer<typeof AnswerSchema>>({
     resolver: zodResolver(AnswerSchema),
@@ -29,6 +32,13 @@ const AnswerForm = () => {
   async function onSubmit(data: z.infer<typeof AnswerSchema>) {
     try {
       setIsSubmitting(true);
+
+      await createAnswer({
+        description: data.description,
+        questionId: params.id,
+      });
+
+      form.reset();
     } catch (error) {
     } finally {
       setIsSubmitting(false);
