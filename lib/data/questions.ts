@@ -30,3 +30,13 @@ export const getQuestions = async ({
 
   return questions;
 };
+
+export const getQuestionById = async (id: string) => {
+  await dbConnect();
+
+  const question = await Question.findById(id)
+    .populate("tags", undefined, Tag)
+    .populate("author", undefined, User);
+
+  return JSON.parse(JSON.stringify(question));
+};
