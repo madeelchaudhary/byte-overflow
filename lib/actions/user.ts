@@ -20,6 +20,16 @@ interface DeleteUserParams {
   clerkId: string;
 }
 
+export const getUserById = async (clerkId: string) => {
+  await dbConnect();
+
+  const user = await User.findOne({
+    clerkId: clerkId,
+  });
+
+  return user;
+};
+
 export const createUser = async ({
   clerkId,
   username,
