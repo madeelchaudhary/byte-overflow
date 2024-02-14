@@ -8,6 +8,7 @@ import Link from "next/link";
 import React from "react";
 import TagBadge from "@/components/shared/TagBadge";
 import AnswerForm from "../_components/AnswerForm";
+import AllAnswers from "../_components/AllAnswers";
 
 const HtmlParser = dynamic(() => import("@/components/shared/HtmlParser"), {
   ssr: false,
@@ -21,7 +22,7 @@ interface Props {
 
 const page = async ({ params: { id } }: Props) => {
   const question = await getQuestionById(id);
-  const { title, description, tags, author, answers, views, createdAt } =
+  const { title, description, tags, author, totalAnswers, views, createdAt } =
     question;
 
   return (
@@ -63,7 +64,7 @@ const page = async ({ params: { id } }: Props) => {
           img="/assets/icons/message.svg"
           alt="message"
           text="Answers"
-          value={humanizeNumber(answers.length)}
+          value={humanizeNumber(totalAnswers)}
         />
         <Metric
           textStyles="small-medium text-dark400_light800"
@@ -83,6 +84,8 @@ const page = async ({ params: { id } }: Props) => {
       </div>
 
       <AnswerForm />
+
+      <AllAnswers questionId={id} totalAnswers={totalAnswers} />
     </>
   );
 };
