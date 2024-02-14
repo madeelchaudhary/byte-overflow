@@ -2,6 +2,7 @@ import dbConnect from "@/lib/dbConnect";
 import Question from "@/db/question.model";
 import Tag from "@/db/tag.model";
 import User from "@/db/user.model";
+import Answer from "@/db/answer.model";
 
 interface GetQuestionParams {
   page?: number;
@@ -38,5 +39,11 @@ export const getQuestionById = async (id: string) => {
     .populate("tags", undefined, Tag)
     .populate("author", undefined, User);
 
-  return JSON.parse(JSON.stringify(question));
+  if (!question) {
+    return null;
+  }
+
+  const totalAnswers = await Answer.find({ question: id }).countDocuments();
+
+  return { ...JSON.parse(JSON.stringify(question)), totalAnswers };
 };
