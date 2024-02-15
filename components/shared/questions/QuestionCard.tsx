@@ -10,7 +10,8 @@ interface Props {
   tags: Array<{ _id: string; name: string }>;
   answers: Array<object>;
   views: number;
-  upvotes: number;
+  upvotes: Array<string>;
+  downvotes: Array<string>;
   author: { _id: string; profile: { name: string; picture: string } };
   createdAt: Date | string;
 }
@@ -62,7 +63,7 @@ const QuestionCard = ({
           img="/assets/icons/like.svg"
           alt="Upvotes"
           text="Upvotes"
-          value={humanizeNumber(upvotes)}
+          value={humanizeNumber(upvotes.length)}
         />
         <Metric
           textStyles="small-medium text-dark400_light800"
