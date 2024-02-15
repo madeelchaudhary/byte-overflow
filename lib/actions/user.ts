@@ -4,6 +4,7 @@ import Question from "@/db/question.model";
 import User from "@/db/user.model";
 import APIError from "../api-error";
 import dbConnect from "../dbConnect";
+import { revalidatePath } from "next/cache";
 
 interface CreateUserParams {
   clerkId: string;
@@ -98,4 +99,39 @@ export const deleteUser = async ({ clerkId }: DeleteUserParams) => {
   await User.deleteOne({ clerkId: clerkId });
 
   return user;
+};
+
+export const saveQuestion = async (questionId: string, userId: string) => {
+  try {
+    await dbConnect();
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      throw new APIError("User not found", 404);
+    }
+
+    const question = await Question.findById(questionId);
+
+    if (!question) {
+      throw new APIError("Question not found", 404);
+    }
+
+    if (user.saved.includes(question._id.toString())) {
+      user.saved = user.saved.filter(
+        (id) => id.toString() !== question._id.toString()
+      );
+    } else {
+      user.saved.push(question._id);
+    }
+
+    await user.save();
+    revalidatePath(`/question/${questionId}`);
+  } catch (error) {
+    console.error("Error saving question", error);
+    if (error instanceof APIError) {
+      return { error: error.message, status: error.code };
+    }
+    return { error: "Internal Server Error", status: 500 };
+  }
 };
