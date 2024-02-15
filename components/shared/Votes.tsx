@@ -3,7 +3,13 @@ import Image from "next/image";
 import React from "react";
 import { Button } from "../ui/button";
 import { humanizeNumber } from "@/lib/utils";
-import { downvoteQuestion, upvoteQuestion } from "@/lib/actions/votes";
+import {
+  downvoteAnswer,
+  downvoteQuestion,
+  upvoteAnswer,
+  upvoteQuestion,
+} from "@/lib/actions/votes";
+import { saveQuestion } from "@/lib/actions/user";
 
 interface Props {
   type: "question" | "answer";
@@ -37,11 +43,22 @@ const Votes = ({
           await downvoteQuestion(itemId, userId);
         }
       } else {
+        if (action === "upvote") {
+          await upvoteAnswer(itemId, userId);
+        }
+
+        if (action === "downvote") {
+          await downvoteAnswer(itemId, userId);
+        }
       }
     } catch (error) {}
   }
 
-  function handleSave() {}
+  async function handleSave() {
+    try {
+      await saveQuestion(itemId, userId);
+    } catch (error) {}
+  }
 
   return (
     <div className="flex gap-5 ">
@@ -87,8 +104,8 @@ const Votes = ({
         </div>
       </div>
 
-      {hasSaved ?? (
-        <Button className="h-auto p-0" onClick={() => handleSave}>
+      {hasSaved !== undefined && (
+        <Button className="h-auto p-0" onClick={() => handleSave()}>
           <Image
             src={
               hasSaved
