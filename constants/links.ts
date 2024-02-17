@@ -10,8 +10,8 @@ export const Sidebar_Links = [
     image: "/assets/icons/users.svg",
   },
   {
-    title: "Collections",
-    href: "/collections",
+    title: "Collection",
+    href: "/collection",
     image: "/assets/icons/star.svg",
   },
   {
