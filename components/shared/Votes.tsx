@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import React from "react";
+import React, { useEffect } from "react";
 import { Button } from "../ui/button";
 import { humanizeNumber } from "@/lib/utils";
 import {
@@ -10,6 +10,7 @@ import {
   upvoteQuestion,
 } from "@/lib/actions/votes";
 import { saveQuestion } from "@/lib/actions/user";
+import { viewQuestion } from "@/lib/actions/interaction";
 
 interface Props {
   type: "question" | "answer";
@@ -59,6 +60,12 @@ const Votes = ({
       await saveQuestion(itemId, userId);
     } catch (error) {}
   }
+
+  useEffect(() => {
+    if (type === "question") {
+      viewQuestion({ questionId: itemId });
+    }
+  }, [type, itemId]);
 
   return (
     <div className="flex gap-5 ">
