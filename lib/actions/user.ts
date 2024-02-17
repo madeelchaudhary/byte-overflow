@@ -128,7 +128,6 @@ export const saveQuestion = async (questionId: string, userId: string) => {
     await user.save();
     revalidatePath(`/question/${questionId}`);
   } catch (error) {
-    console.error("Error saving question", error);
     if (error instanceof APIError) {
       return { error: error.message, status: error.code };
     }
