@@ -46,7 +46,7 @@ const AnswerForm = () => {
   }
 
   return (
-    <div>
+    <div className="mt-8">
       <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-center sm:gap-2">
         <h2 className="paragraph-semibold text-dark400_light800">
           Your Answer Goes Here
@@ -75,7 +75,7 @@ const AnswerForm = () => {
             render={({ field }) => (
               <FormItem className="flex w-full flex-col gap-3">
                 <FormControl className="mt-3.5">
-                  <MarkDownEditor field={field} />
+                  <MarkDownEditor field={field} initialValue="" />
                 </FormControl>
                 <FormMessage className="text-red-500" />
               </FormItem>
