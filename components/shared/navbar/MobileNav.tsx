@@ -8,7 +8,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Sidebar_Links } from "@/constants/links";
-import { SignedOut } from "@clerk/nextjs";
+import { SignedOut, useAuth } from "@clerk/nextjs";
 import { AlignJustify } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -16,11 +16,16 @@ import { usePathname } from "next/navigation";
 
 const NavContent = () => {
   const path = usePathname();
+  const { userId } = useAuth();
 
   return (
     <section className="flex h-full flex-col gap-6 pt-16">
       {Sidebar_Links.map((link) => {
         const isActive = path === link.href;
+
+        if (link.href === "/profile" && !userId) return null;
+        if (link.href === "/profile" && userId)
+          link.href = `/profile/${userId}`;
 
         return (
           <SheetClose key={link.href} asChild>
