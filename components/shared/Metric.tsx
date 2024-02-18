@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import React from "react";
 
 interface Props {
@@ -20,8 +21,8 @@ const Metric = ({
   href,
   isAuthor,
 }: Props) => {
-  return (
-    <div className="flex-center flex-wrap gap-1">
+  const metricContent = (
+    <>
       <Image
         src={img}
         alt={alt}
@@ -39,8 +40,17 @@ const Metric = ({
           {text}
         </span>
       </p>
-    </div>
+    </>
   );
+
+  if (href)
+    return (
+      <Link href={href} className="flex-center gap-1">
+        {metricContent}
+      </Link>
+    );
+
+  return <div className="flex-center flex-wrap gap-1">{metricContent}</div>;
 };
 
 export default Metric;
