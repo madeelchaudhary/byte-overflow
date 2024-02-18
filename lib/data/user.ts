@@ -3,6 +3,7 @@ import Tag from "@/db/tag.model";
 import Question, { IQuestion } from "@/db/question.model";
 import dbConnect from "../dbConnect";
 import { FilterQuery } from "mongoose";
+import { QuestionData } from "../types";
 
 interface GetUsersParams {
   page?: number;
@@ -17,6 +18,12 @@ interface GetSavedQuestionsParams {
   pageSize?: number;
   search?: string;
   filter?: string;
+}
+
+interface GetUserQuestionsParams {
+  userId: string;
+  page?: number;
+  pageSize?: number;
 }
 
 export const getUsers = async ({ page = 1, pageSize = 10 }: GetUsersParams) => {
@@ -66,4 +73,42 @@ export const getSavedQuestions = async ({
   if (!user) return null;
 
   return JSON.parse(JSON.stringify(user.saved));
+};
+
+export const getUserInfo = async (clerkId: string) => {
+  await dbConnect();
+
+  const user = await User.findOne({ clerkId });
+
+  if (!user) return null;
+
+  const totalQuestions = await Question.countDocuments({ author: user._id });
+  const totalAnswers = user.answers.length;
+
+  return {
+    user,
+    totalQuestions,
+    totalAnswers,
+  };
+};
+
+export const getUserQuestions = async ({
+  userId,
+  page = 1,
+  pageSize = 10,
+}: GetUserQuestionsParams) => {
+  await dbConnect();
+
+  const result = await Question.find({ author: userId })
+    .limit(pageSize)
+    .skip((page - 1) * pageSize)
+    .sort({ views: -1, upvotes: -1 })
+    .populate("tags")
+    .populate("author");
+
+  const questions = result.map((question) => {
+    return JSON.parse(JSON.stringify(question));
+  });
+
+  return questions as QuestionData[];
 };
