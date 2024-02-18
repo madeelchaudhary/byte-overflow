@@ -3,7 +3,8 @@ import Tag from "@/db/tag.model";
 import Question, { IQuestion } from "@/db/question.model";
 import dbConnect from "../dbConnect";
 import { FilterQuery } from "mongoose";
-import { QuestionData } from "../types";
+import { AnswerData, QuestionData } from "../types";
+import Answer from "@/db/answer.model";
 
 interface GetUsersParams {
   page?: number;
@@ -20,7 +21,7 @@ interface GetSavedQuestionsParams {
   filter?: string;
 }
 
-interface GetUserQuestionsParams {
+interface GetUserDocumentsParams {
   userId: string;
   page?: number;
   pageSize?: number;
@@ -96,7 +97,7 @@ export const getUserQuestions = async ({
   userId,
   page = 1,
   pageSize = 10,
-}: GetUserQuestionsParams) => {
+}: GetUserDocumentsParams) => {
   await dbConnect();
 
   const result = await Question.find({ author: userId })
@@ -111,4 +112,25 @@ export const getUserQuestions = async ({
   });
 
   return questions as QuestionData[];
+};
+
+export const getUserAnswers = async ({
+  userId,
+  page = 1,
+  pageSize = 10,
+}: GetUserDocumentsParams) => {
+  await dbConnect();
+
+  const result = await Answer.find({ author: userId })
+    .limit(pageSize)
+    .skip((page - 1) * pageSize)
+    .sort({ upvotes: -1 })
+    .populate("question")
+    .populate("author");
+
+  const answers = result.map((answer) => {
+    return JSON.parse(JSON.stringify(answer));
+  });
+
+  return answers as AnswerData[];
 };
