@@ -1,6 +1,7 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import React from "react";
 import ProfileQuestionTab from "./ProfileQuestionTab";
+import ProfileAnswerTab from "./ProfileAnswerTab";
 
 interface Props {
   userId: string;
@@ -18,10 +19,18 @@ const ProfileTabs = ({ userId, clerkId }: Props) => {
           Answers
         </TabsTrigger>
       </TabsList>
-      <TabsContent value="topPosts">
+      <TabsContent
+        value="topPosts"
+        className="flex w-full flex-col gap-6 data-[state=active]:mt-5"
+      >
         <ProfileQuestionTab userId={userId} clerkId={clerkId} />
       </TabsContent>
-      <TabsContent value="answers"></TabsContent>
+      <TabsContent
+        value="answers"
+        className="flex w-full flex-col gap-6 data-[state=active]:mt-5"
+      >
+        <ProfileAnswerTab userId={userId} clerkId={clerkId} />
+      </TabsContent>
     </Tabs>
   );
 };
