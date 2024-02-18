@@ -3,17 +3,10 @@ import React from "react";
 import TagBadge from "../TagBadge";
 import Metric from "../Metric";
 import { humanizeDate, humanizeNumber } from "@/lib/utils";
+import { QuestionData } from "@/lib/types";
 
-interface Props {
-  _id: string;
-  title: string;
-  tags: Array<{ _id: string; name: string }>;
-  answers: Array<object>;
-  views: number;
-  upvotes: Array<string>;
-  downvotes: Array<string>;
-  author: { _id: string; profile: { name: string; picture: string } };
-  createdAt: Date | string;
+interface Props extends QuestionData {
+  clerkId?: string | null;
 }
 
 const QuestionCard = ({
@@ -51,11 +44,11 @@ const QuestionCard = ({
       <div className="flex-between mt-6 w-full flex-wrap gap-3">
         <Metric
           textStyles="body-medium text-dark400_light700"
-          img="/assets/icons/avatar.svg"
+          img={author.profile.avatar || "/assets/icons/avatar.svg"}
           alt="user"
           text={` asked ${humanizeDate(createdAt)}`}
           value={author.profile.name}
-          href={`/profile/${author._id}`}
+          href={`/profile/${author.clerkId}`}
           isAuthor
         />
         <Metric
