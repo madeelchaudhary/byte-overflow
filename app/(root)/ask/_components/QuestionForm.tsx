@@ -16,13 +16,14 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { createQuestion } from "@/lib/actions/questions";
+import { createQuestion, editQuestion } from "@/lib/actions/questions";
 import { QuestionSchema } from "@/lib/validations";
 import Image from "next/image";
 import { useState } from "react";
 
 interface QuestionFormProps {
   type?: "ask" | "edit";
+  question?: z.infer<typeof QuestionSchema> & { _id: string };
 }
 
 type Field = ControllerRenderProps<{
@@ -31,22 +32,25 @@ type Field = ControllerRenderProps<{
   tags: string[];
 }>;
 
-const QuestionForm = ({ type = "ask" }: QuestionFormProps) => {
+const QuestionForm = ({ type = "ask", question }: QuestionFormProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm({
     resolver: zodResolver(QuestionSchema),
     defaultValues: {
-      title: "",
-      description: "",
-      tags: [] as string[],
+      title: question?.title || "",
+      description: question?.description || "",
+      tags: (question?.tags || []) as string[],
     },
   });
 
   async function onSubmit(data: z.infer<typeof QuestionSchema>) {
     try {
       setIsSubmitting(true);
-      createQuestion(data);
+      if (type === "ask") await createQuestion(data);
+      if (type === "edit") {
+        await editQuestion({ questionId: question!._id, ...data });
+      }
     } catch (error) {
     } finally {
       setIsSubmitting(false);
@@ -122,7 +126,10 @@ const QuestionForm = ({ type = "ask" }: QuestionFormProps) => {
                 <span className="text-primary-500">*</span>
               </FormLabel>
               <FormControl className="mt-3.5">
-                <MarkDownEditor field={field} />
+                <MarkDownEditor
+                  field={field}
+                  initialValue={type === "edit" ? question?.description : ""}
+                />
               </FormControl>
               <FormDescription className="body-regular mt-2.5 text-light-500">
                 Include all the information someone would need to answer your
