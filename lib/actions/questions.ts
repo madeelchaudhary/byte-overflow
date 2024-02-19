@@ -15,6 +15,9 @@ import APIError from "../api-error";
 import { QuestionSchema } from "../validations";
 
 type CreateQuestionParams = z.infer<typeof QuestionSchema>;
+type EditQuestionParams = z.infer<typeof QuestionSchema> & {
+  questionId: string;
+};
 
 export async function createQuestion(params: CreateQuestionParams) {
   try {
@@ -120,4 +123,82 @@ export const deleteQuestion = async (questionId: string, path?: string) => {
     }
     return { error: "Internal Server Error", status: 500 };
   }
+};
+
+export const editQuestion = async (params: EditQuestionParams) => {
+  let path = `/question/${params.questionId}`;
+
+  try {
+    await dbConnect();
+
+    const { success } = QuestionSchema.safeParse(params);
+
+    if (!success) {
+      throw new APIError("Invalid input", 400);
+    }
+
+    const { title, description, tags, questionId } = params;
+
+    const { userId } = auth();
+
+    if (!userId) {
+      throw new APIError("You must be logged in to edit a question", 401);
+    }
+
+    const question = await Question.findById(questionId).populate("author");
+
+    if (!question) {
+      throw new APIError("Question not found", 404);
+    }
+
+    if ((question.author as any).clerkId !== userId) {
+      throw new APIError("You can only edit your own questions", 403);
+    }
+
+    const tagsDoc = [];
+
+    for (const tag of tags) {
+      const tagDoc = await Tag.findOne({
+        name: { $regex: new RegExp(tag, "i") },
+      });
+      if (tagDoc) {
+        if (!tagDoc.questions.includes(question._id)) {
+          tagDoc.questions.push(question._id);
+          await tagDoc.save();
+        }
+        tagsDoc.push(tagDoc);
+      } else {
+        const newTag = new Tag({
+          name: tag,
+          description: `Questions related to ${tag}`,
+          questions: [question._id],
+        });
+        tagsDoc.push(newTag);
+        await newTag.save();
+      }
+    }
+
+    const oldTags = question.tags.map((tag) => tag.toString());
+    const newTags = tagsDoc.map((tag) => tag._id.toString());
+    const tagsToRemove = oldTags.filter((tag) => !newTags.includes(tag));
+
+    await Tag.updateMany(
+      { _id: { $in: tagsToRemove } },
+      { $pull: { questions: question._id } }
+    );
+
+    question.title = title;
+    question.description = description;
+    question.tags = tagsDoc.map((tag) => tag._id);
+
+    await question.save();
+  } catch (error) {
+    if (error instanceof APIError) {
+      return { error: error.message, status: error.code };
+    }
+    return { error: "Internal Server Error", status: 500 };
+  }
+
+  revalidatePath(path);
+  redirect(path);
 };
