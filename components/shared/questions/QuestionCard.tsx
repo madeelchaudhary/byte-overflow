@@ -4,6 +4,8 @@ import TagBadge from "../TagBadge";
 import Metric from "../Metric";
 import { humanizeDate, humanizeNumber } from "@/lib/utils";
 import { QuestionData } from "@/lib/types";
+import { SignedIn } from "@clerk/nextjs";
+import EditDeleteActions from "../EditDeleteActions";
 
 interface Props extends QuestionData {
   clerkId?: string | null;
@@ -11,6 +13,7 @@ interface Props extends QuestionData {
 
 const QuestionCard = ({
   _id,
+  clerkId,
   title,
   tags,
   answers,
@@ -19,6 +22,8 @@ const QuestionCard = ({
   views,
   createdAt,
 }: Props) => {
+  const showActionsButtons = clerkId && clerkId === author.clerkId;
+
   return (
     <div className="card-wrapper rounded-xl p-9 sm:px-11">
       <div className="flex flex-col-reverse items-start justify-between gap-5 sm:flex-row">
@@ -32,7 +37,12 @@ const QuestionCard = ({
             </h3>
           </Link>
         </div>
-        {/* allow edit if author */}
+
+        <SignedIn>
+          {showActionsButtons && (
+            <EditDeleteActions type="question" itemId={_id} />
+          )}
+        </SignedIn>
       </div>
 
       <div className="mt-3.5 flex flex-wrap gap-2">
