@@ -3,8 +3,8 @@ import Link from "next/link";
 import Metric from "@/components/shared/Metric";
 import { humanizeNumber, humanizeDate } from "@/lib/utils";
 import { SignedIn } from "@clerk/nextjs";
-// import EditDeleteAction from "../shared/EditDeleteAction";
 import { AnswerData } from "@/lib/types";
+import EditDeleteActions from "../EditDeleteActions";
 
 interface Props extends AnswerData {
   clerkId: string | null;
@@ -33,9 +33,9 @@ const AnswerCard = ({
         </Link>
 
         <SignedIn>
-          {/* {showActionsButtons && (
-            <EditDeleteAction type="Answer" itemId={JSON.stringify(_id)} />
-          )} */}
+          {showActionsButtons && (
+            <EditDeleteActions type="answer" itemId={_id} />
+          )}
         </SignedIn>
       </div>
 
