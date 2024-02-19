@@ -8,13 +8,13 @@ interface Props {
   clerkId: string | null;
 }
 
-const ProfileQuestionTab = async ({ userId }: Props) => {
+const ProfileQuestionTab = async ({ userId, clerkId }: Props) => {
   const questions = await getUserQuestions({ userId });
   return (
     <>
       {questions.length > 0 ? (
         questions.map((question) => (
-          <QuestionCard key={question._id} {...question} />
+          <QuestionCard key={question._id} {...question} clerkId={clerkId} />
         ))
       ) : (
         <NoResultsFound
