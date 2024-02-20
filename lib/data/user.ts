@@ -3,7 +3,7 @@ import Tag from "@/db/tag.model";
 import Question, { IQuestion } from "@/db/question.model";
 import dbConnect from "../dbConnect";
 import { FilterQuery } from "mongoose";
-import { AnswerData, QuestionData } from "../types";
+import { AnswerData, QuestionData, UserData } from "../types";
 import Answer from "@/db/answer.model";
 
 interface GetUsersParams {
@@ -40,6 +40,16 @@ export const getUsers = async ({ page = 1, pageSize = 10 }: GetUsersParams) => {
   });
 
   return users;
+};
+
+export const getUserByClerkId = async (clerkId: string) => {
+  await dbConnect();
+
+  const user = await User.findOne({ clerkId });
+
+  if (!user) return null;
+
+  return JSON.parse(JSON.stringify(user)) as UserData;
 };
 
 export const getSavedQuestions = async ({
