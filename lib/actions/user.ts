@@ -5,6 +5,9 @@ import User from "@/db/user.model";
 import APIError from "../api-error";
 import dbConnect from "../dbConnect";
 import { revalidatePath } from "next/cache";
+import { z } from "zod";
+import { ProfileSchema } from "../validations";
+import { redirect } from "next/navigation";
 
 interface CreateUserParams {
   clerkId: string;
@@ -20,6 +23,10 @@ interface UpdateUserParams extends CreateUserParams {}
 interface DeleteUserParams {
   clerkId: string;
 }
+
+type EditProfileParams = z.infer<typeof ProfileSchema> & {
+  userId: string;
+};
 
 export const getUserById = async (clerkId: string) => {
   await dbConnect();
@@ -133,4 +140,51 @@ export const saveQuestion = async (questionId: string, userId: string) => {
     }
     return { error: "Internal Server Error", status: 500 };
   }
+};
+
+export const editProfile = async ({
+  userId,
+  name,
+  portfolio,
+  location,
+  bio,
+}: EditProfileParams) => {
+  let path: string;
+  try {
+    await dbConnect();
+
+    const validation = ProfileSchema.safeParse({
+      name,
+      portfolio,
+      location,
+      bio,
+    });
+
+    if (!validation.success) {
+      throw new APIError("Invalid data", 400);
+    }
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      throw new APIError("User not found", 404);
+    }
+
+    user.profile.name = name;
+    user.profile.portfolio = portfolio;
+    user.profile.location = location;
+    user.profile.bio = bio;
+
+    await user.save();
+
+    path = `/profile/${user.clerkId}`;
+  } catch (error) {
+    if (error instanceof APIError) {
+      return { error: error.message, status: error.code };
+    }
+    return { error: "Internal Server Error", status: 500 };
+  }
+
+  revalidatePath(path);
+  redirect(path);
 };
