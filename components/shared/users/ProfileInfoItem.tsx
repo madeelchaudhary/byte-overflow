@@ -12,7 +12,7 @@ const ProfileInfoItem = ({ img, title, href }: Props) => {
   return (
     <li className="flex-center gap-1">
       <Image src={img} alt={title} width={20} height={20} />
-      {href && (
+      {href ? (
         <Link
           href={href}
           target="_blank"
@@ -20,8 +20,9 @@ const ProfileInfoItem = ({ img, title, href }: Props) => {
         >
           {title}
         </Link>
+      ) : (
+        <p className="paragraph-medium text-dark400_light700">{title}</p>
       )}
-      <p className="paragraph-medium text-dark400_light700">{title}</p>
     </li>
   );
 };
