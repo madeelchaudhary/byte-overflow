@@ -3,6 +3,7 @@ import Question from "@/db/question.model";
 import Tag from "@/db/tag.model";
 import User from "@/db/user.model";
 import Answer from "@/db/answer.model";
+import { QuestionData } from "../types";
 
 interface GetQuestionParams {
   page?: number;
@@ -46,4 +47,19 @@ export const getQuestionById = async (id: string) => {
   const totalAnswers = await Answer.find({ question: id }).countDocuments();
 
   return { ...JSON.parse(JSON.stringify(question)), totalAnswers };
+};
+
+export const getHotQuestions = async ({ page = 1, pageSize = 5 }) => {
+  await dbConnect();
+
+  const result = await Question.find()
+    .sort({ upvotes: -1, views: -1 })
+    .skip((page - 1) * pageSize)
+    .limit(pageSize);
+
+  const questions = result.map((question) => {
+    return JSON.parse(JSON.stringify(question));
+  });
+
+  return questions as QuestionData[];
 };
