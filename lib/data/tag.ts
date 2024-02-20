@@ -106,3 +106,36 @@ export const GetQuestionsByTagId = async ({
 
   return { tagId: tag._id, tagTitle: tag.name, questions };
 };
+
+export const getHotTags = async ({ page = 1, pageSize = 5 }) => {
+  await dbConnect();
+
+  const result = await Tag.aggregate([
+    {
+      $lookup: {
+        from: "questions",
+        localField: "_id",
+        foreignField: "tags",
+        as: "questions",
+      },
+    },
+    {
+      $project: {
+        name: 1,
+        description: 1,
+        totalQuestions: { $size: "$questions" },
+      },
+    },
+    {
+      $sort: { totalQuestions: -1 },
+    },
+    {
+      $skip: (page - 1) * pageSize,
+    },
+    {
+      $limit: pageSize,
+    },
+  ]);
+
+  return result as { _id: string; name: string; totalQuestions: number }[];
+};
