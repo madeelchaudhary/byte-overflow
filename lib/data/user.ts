@@ -73,11 +73,14 @@ export const getSavedQuestions = async ({
 }: GetSavedQuestionsParams) => {
   await dbConnect();
 
-  const searchQuery: FilterQuery<IQuestion> = search
-    ? {
-        title: { $regex: new RegExp(search, "i") },
-      }
-    : {};
+  const searchQuery: FilterQuery<IQuestion> = {};
+
+  if (search) {
+    searchQuery.$or = [
+      { title: { $regex: search, $options: "i" } },
+      { description: { $regex: search, $options: "i" } },
+    ];
+  }
 
   const user = await User.findOne({ clerkId }).populate({
     path: "saved",
