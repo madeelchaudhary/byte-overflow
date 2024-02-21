@@ -5,8 +5,15 @@ import TagCard from "@/components/shared/tags/TagCard";
 import { TagFilters } from "@/constants/filters";
 import { getTagsWithQuestionsCount } from "@/lib/data/tag";
 
-const page = async () => {
-  const tags = await getTagsWithQuestionsCount();
+interface Props {
+  searchParams: {
+    [key: string]: any;
+  };
+}
+
+const page = async ({ searchParams }: Props) => {
+  const q = searchParams.q || "";
+  const tags = await getTagsWithQuestionsCount({ search: q });
 
   return (
     <>
