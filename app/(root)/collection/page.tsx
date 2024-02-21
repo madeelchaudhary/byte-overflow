@@ -8,15 +8,23 @@ import LocalSearch from "@/components/shared/search/LocalSearch";
 import { QuestionFilters } from "@/constants/filters";
 import { getSavedQuestions } from "@/lib/data/user";
 
-const page = async () => {
+interface Props {
+  searchParams: {
+    [key: string]: any;
+  };
+}
+
+const page = async ({ searchParams }: Props) => {
   const { userId } = auth();
 
   if (!userId) {
     return notFound();
   }
 
+  const q = searchParams.q || "";
   const questions = await getSavedQuestions({
     clerkId: userId,
+    search: q,
   });
 
   return (
