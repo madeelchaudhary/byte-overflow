@@ -5,8 +5,16 @@ import UserCard from "@/components/shared/users/UserCard";
 import { UserFilters } from "@/constants/filters";
 import { getUsers } from "@/lib/data/user";
 
-const page = async () => {
-  const users = await getUsers({});
+interface Props {
+  searchParams: {
+    [key: string]: any;
+  };
+}
+
+const page = async ({ searchParams }: Props) => {
+  const q = searchParams.q || "";
+
+  const users = await getUsers({ search: q });
 
   return (
     <>
