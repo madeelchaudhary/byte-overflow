@@ -27,10 +27,23 @@ interface GetUserDocumentsParams {
   pageSize?: number;
 }
 
-export const getUsers = async ({ page = 1, pageSize = 10 }: GetUsersParams) => {
+export const getUsers = async ({
+  page = 1,
+  pageSize = 10,
+  search,
+}: GetUsersParams) => {
   await dbConnect();
 
-  const result = await User.find()
+  const searchQuery: FilterQuery<UserData> = {};
+
+  if (search) {
+    searchQuery.$or = [
+      { "profile.name": { $regex: search, $options: "i" } },
+      { username: { $regex: search, $options: "i" } },
+    ];
+  }
+
+  const result = await User.find(searchQuery)
     .limit(pageSize)
     .skip((page - 1) * pageSize)
     .sort({ createdAt: -1 });
