@@ -1,9 +1,10 @@
 import dbConnect from "@/lib/dbConnect";
-import Question from "@/db/question.model";
+import Question, { IQuestion } from "@/db/question.model";
 import Tag from "@/db/tag.model";
 import User from "@/db/user.model";
 import Answer from "@/db/answer.model";
 import { QuestionData } from "../types";
+import { FilterQuery } from "mongoose";
 
 interface GetQuestionParams {
   page?: number;
@@ -19,7 +20,16 @@ export const getQuestions = async ({
 }: GetQuestionParams) => {
   await dbConnect();
 
-  const result = await Question.find()
+  const query: FilterQuery<IQuestion> = {};
+
+  if (search) {
+    query.$or = [
+      { title: { $regex: search, $options: "i" } },
+      { description: { $regex: search, $options: "i" } },
+    ];
+  }
+
+  const result = await Question.find(query)
     .populate("tags", undefined, Tag)
     .populate("author", undefined, User)
     .sort({ createdAt: -1 })
