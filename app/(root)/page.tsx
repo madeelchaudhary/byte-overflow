@@ -47,7 +47,7 @@ export default async function Home({ searchParams }: Props) {
 
       <TagFilter
         filters={HomePageFilters}
-        wrapperClassName="mt-10 flex md:flex"
+        wrapperClassName="mt-10 flex md:flex max-md:hidden"
       />
 
       <div className="mt-10 flex w-full flex-col gap-6 ">
