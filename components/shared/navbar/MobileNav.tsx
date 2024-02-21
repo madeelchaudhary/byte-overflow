@@ -70,12 +70,12 @@ const MobileNav = () => {
         <Link className="flex items-center gap-1" href="/">
           <Image
             src="/assets/images/site-logo.svg"
-            alt="Dev Flow"
+            alt="Byte Overflow"
             height={23}
             width={23}
           />
           <p className="h2-bold  text-dark100_light900 font-spaceGrotesk">
-            Dev
+            Byte
             <span className="text-primary-500">Overflow</span>
           </p>
         </Link>
