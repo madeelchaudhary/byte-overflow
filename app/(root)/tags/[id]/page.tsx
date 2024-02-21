@@ -1,12 +1,21 @@
 import NoResultsFound from "@/components/shared/NoResultsFound";
 import QuestionCard from "@/components/shared/questions/QuestionCard";
 import LocalSearch from "@/components/shared/search/LocalSearch";
-import { GetQuestionsByTagId } from "@/lib/data/tag";
+import { getQuestionsByTagId } from "@/lib/data/tag";
 import { notFound } from "next/navigation";
-import React from "react";
 
-const page = async ({ params: { id } }: { params: { id: string } }) => {
-  const result = await GetQuestionsByTagId({ tagId: id });
+interface Props {
+  searchParams: {
+    [key: string]: any;
+  };
+  params: {
+    id: string;
+  };
+}
+
+const page = async ({ params: { id }, searchParams }: Props) => {
+  const q = searchParams.q || "";
+  const result = await getQuestionsByTagId({ tagId: id, search: q });
 
   if (!result) return notFound();
 
