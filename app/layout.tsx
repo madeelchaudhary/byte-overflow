@@ -17,7 +17,7 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
-  title: "Dev Flow | Stack Overflow for Developers",
+  title: "Byte Overflow | Stack Overflow for Developers",
   description: "Stack Overflow for Developers",
 };
 
