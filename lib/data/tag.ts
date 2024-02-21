@@ -1,7 +1,8 @@
-import Tag from "@/db/tag.model";
+import Tag, { ITag } from "@/db/tag.model";
 import Question from "@/db/question.model";
 import User from "@/db/user.model";
 import dbConnect from "../dbConnect";
+import { FilterQuery } from "mongoose";
 
 interface GetUserTagsParams {
   userId: string;
@@ -46,9 +47,18 @@ export const getUserRelatedTags = async ({
   ];
 };
 
-export const getTagsWithQuestionsCount = async () => {
+export const getTagsWithQuestionsCount = async ({ search }: GetTagsParams) => {
   try {
     await dbConnect();
+
+    const searchQuery: FilterQuery<ITag> = {};
+
+    if (search) {
+      searchQuery.$or = [
+        { name: { $regex: search, $options: "i" } },
+        { description: { $regex: search, $options: "i" } },
+      ];
+    }
 
     const tagsWithQuestionsCount = await Tag.aggregate([
       {
@@ -65,6 +75,9 @@ export const getTagsWithQuestionsCount = async () => {
           description: 1,
           questionsCount: { $size: "$questions" },
         },
+      },
+      {
+        $match: searchQuery,
       },
     ]);
 
