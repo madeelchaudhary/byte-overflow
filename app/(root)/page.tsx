@@ -9,8 +9,15 @@ import { Button } from "@/components/ui/button";
 import { HomePageFilters } from "@/constants/filters";
 import { getQuestions } from "@/lib/data/questions";
 
-export default async function Home() {
-  const questions = await getQuestions({});
+interface Props {
+  searchParams: {
+    [key: string]: any;
+  };
+}
+
+export default async function Home({ searchParams }: Props) {
+  const q = searchParams.q || "";
+  const questions = await getQuestions({ search: q });
 
   return (
     <>
