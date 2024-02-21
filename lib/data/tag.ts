@@ -1,5 +1,5 @@
 import Tag, { ITag } from "@/db/tag.model";
-import Question from "@/db/question.model";
+import Question, { IQuestion } from "@/db/question.model";
 import User from "@/db/user.model";
 import dbConnect from "../dbConnect";
 import { FilterQuery } from "mongoose";
@@ -88,7 +88,7 @@ export const getTagsWithQuestionsCount = async ({ search }: GetTagsParams) => {
   }
 };
 
-export const GetQuestionsByTagId = async ({
+export const getQuestionsByTagId = async ({
   tagId,
   page = 1,
   pageSize = 10,
@@ -96,10 +96,19 @@ export const GetQuestionsByTagId = async ({
 }: GetQuestionsByTagParams) => {
   await dbConnect();
 
+  const searchQuery: FilterQuery<IQuestion> = {};
+
+  if (search) {
+    searchQuery.$or = [
+      { title: { $regex: search, $options: "i" } },
+      { description: { $regex: search, $options: "i" } },
+    ];
+  }
+
   const tag = await Tag.findById(tagId).populate({
     path: "questions",
     model: Question,
-    match: search ? { title: { $regex: search, $options: "i" } } : {},
+    match: searchQuery,
     options: {
       limit: pageSize,
       skip: (page - 1) * pageSize,
