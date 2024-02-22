@@ -13,8 +13,9 @@ interface Props {
 
 const page = async ({ searchParams }: Props) => {
   const q = searchParams.q || "";
+  const filter = searchParams.filter || "";
 
-  const users = await getUsers({ search: q });
+  const users = await getUsers({ search: q, filter });
 
   return (
     <>
