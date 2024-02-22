@@ -13,7 +13,7 @@ interface GetTagsParams {
   page?: number;
   pageSize?: number;
   search?: string;
-  filters?: string;
+  filter?: string;
 }
 
 interface GetQuestionsByTagParams {
@@ -47,7 +47,10 @@ export const getUserRelatedTags = async ({
   ];
 };
 
-export const getTagsWithQuestionsCount = async ({ search }: GetTagsParams) => {
+export const getTagsWithQuestionsCount = async ({
+  search,
+  filter,
+}: GetTagsParams) => {
   try {
     await dbConnect();
 
@@ -58,6 +61,22 @@ export const getTagsWithQuestionsCount = async ({ search }: GetTagsParams) => {
         { name: { $regex: search, $options: "i" } },
         { description: { $regex: search, $options: "i" } },
       ];
+    }
+
+    const sortOptions: { [key: string]: any } = {};
+
+    if (filter) {
+      if (filter === "recent") {
+        sortOptions["createdAt"] = -1;
+      } else if (filter === "old") {
+        sortOptions["createdAt"] = 1;
+      } else if (filter === "popular") {
+        sortOptions["questionsCount"] = -1;
+      } else if (filter === "name") {
+        sortOptions["name"] = 1;
+      }
+    } else {
+      sortOptions["createdAt"] = -1;
     }
 
     const tagsWithQuestionsCount = await Tag.aggregate([
@@ -74,10 +93,14 @@ export const getTagsWithQuestionsCount = async ({ search }: GetTagsParams) => {
           name: 1,
           description: 1,
           questionsCount: { $size: "$questions" },
+          createdAt: 1,
         },
       },
       {
         $match: searchQuery,
+      },
+      {
+        $sort: sortOptions,
       },
     ]);
 
