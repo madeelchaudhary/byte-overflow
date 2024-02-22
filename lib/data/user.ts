@@ -85,6 +85,7 @@ export const getSavedQuestions = async ({
   page = 1,
   pageSize = 10,
   search,
+  filter,
 }: GetSavedQuestionsParams) => {
   await dbConnect();
 
@@ -97,13 +98,31 @@ export const getSavedQuestions = async ({
     ];
   }
 
+  const sortOptions: { [key: string]: any } = {};
+
+  if (filter) {
+    if (filter === "most_recent") {
+      sortOptions["createdAt"] = -1;
+    } else if (filter === "oldest") {
+      sortOptions["createdAt"] = 1;
+    } else if (filter === "most_voted") {
+      sortOptions["upvotes"] = -1;
+    } else if (filter === "most_answered") {
+      sortOptions["answers"] = -1;
+    } else if (filter === "most_viewed") {
+      sortOptions["views"] = -1;
+    }
+  } else {
+    sortOptions["createdAt"] = -1;
+  }
+
   const user = await User.findOne({ clerkId }).populate({
     path: "saved",
     model: Question,
     options: {
       limit: pageSize,
       skip: (page - 1) * pageSize,
-      sort: { createdAt: -1 },
+      sort: sortOptions,
     },
     populate: [
       { path: "author", model: User },
