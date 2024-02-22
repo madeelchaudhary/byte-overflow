@@ -22,9 +22,11 @@ const page = async ({ searchParams }: Props) => {
   }
 
   const q = searchParams.q || "";
+  const filter = searchParams.filter || "";
   const questions = await getSavedQuestions({
     clerkId: userId,
     search: q,
+    filter,
   });
 
   return (
