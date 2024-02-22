@@ -1,6 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import React from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 interface Props {
   filters: {
@@ -12,14 +12,29 @@ interface Props {
 }
 
 const TagFilter = ({ filters, className, wrapperClassName }: Props) => {
-  const selected = undefined;
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const router = useRouter();
+
+  const selected = searchParams.get("filter");
+
+  function handleFilter(value: string) {
+    const params = new URLSearchParams(searchParams);
+    if (value === selected) {
+      params.delete("filter");
+    } else {
+      params.set("filter", value);
+    }
+
+    router.push(`${pathname}?${params.toString()}`);
+  }
 
   return (
     <div className={`flex flex-wrap gap-3 ${wrapperClassName}`}>
       {filters.map((filter) => (
         <Button
           key={filter.value}
-          onClick={() => {}}
+          onClick={() => handleFilter(filter.value)}
           className={`body-medium rounded-lg px-6 py-3 capitalize shadow-none ${
             selected === filter.value
               ? "bg-primary-100 text-primary-500"
