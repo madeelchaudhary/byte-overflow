@@ -31,6 +31,7 @@ export const getUsers = async ({
   page = 1,
   pageSize = 10,
   search,
+  filter,
 }: GetUsersParams) => {
   await dbConnect();
 
@@ -43,10 +44,24 @@ export const getUsers = async ({
     ];
   }
 
+  const sortOptions: { [key: string]: any } = {};
+
+  if (filter) {
+    if (filter === "new_users") {
+      sortOptions["createdAt"] = -1;
+    } else if (filter === "old_users") {
+      sortOptions["createdAt"] = 1;
+    } else if (filter === "top_contributors") {
+      sortOptions["profile.reputation"] = -1;
+    }
+  } else {
+    sortOptions["createdAt"] = -1;
+  }
+
   const result = await User.find(searchQuery)
     .limit(pageSize)
     .skip((page - 1) * pageSize)
-    .sort({ createdAt: -1 });
+    .sort(sortOptions);
 
   const users = result.map((user) => {
     return JSON.parse(JSON.stringify(user));
