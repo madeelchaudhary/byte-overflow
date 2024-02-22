@@ -17,7 +17,8 @@ interface Props {
 
 export default async function Home({ searchParams }: Props) {
   const q = searchParams.q || "";
-  const questions = await getQuestions({ search: q });
+  const filter = searchParams.filter || "";
+  const questions = await getQuestions({ search: q, filter });
 
   return (
     <>
