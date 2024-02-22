@@ -17,6 +17,7 @@ export const getQuestions = async ({
   page = 1,
   pageSize = 10,
   search = "",
+  filter,
 }: GetQuestionParams) => {
   await dbConnect();
 
@@ -29,10 +30,25 @@ export const getQuestions = async ({
     ];
   }
 
+  const sortOptions: { [key: string]: any } = {};
+
+  if (filter) {
+    if (filter === "newest") {
+      sortOptions["createdAt"] = -1;
+    } else if (filter === "frequent") {
+      sortOptions["views"] = -1;
+    } else if (filter === "unanswered") {
+      query.$or = [{ answers: { $size: 0 } }, { answers: { $exists: false } }];
+      sortOptions["createdAt"] = -1;
+    }
+  } else {
+    sortOptions["createdAt"] = -1;
+  }
+
   const result = await Question.find(query)
     .populate("tags", undefined, Tag)
     .populate("author", undefined, User)
-    .sort({ createdAt: -1 })
+    .sort(sortOptions)
     .skip((page - 1) * pageSize)
     .limit(pageSize);
 
