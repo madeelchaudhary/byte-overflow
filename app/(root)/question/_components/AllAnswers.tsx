@@ -11,11 +11,17 @@ import React from "react";
 interface Props {
   questionId: string;
   totalAnswers: number;
+  filter?: string;
   userId: string;
 }
 
-const AllAnswers = async ({ questionId, totalAnswers, userId }: Props) => {
-  const answers = await getAnswers({ questionId });
+const AllAnswers = async ({
+  questionId,
+  totalAnswers,
+  userId,
+  filter,
+}: Props) => {
+  const answers = await getAnswers({ questionId, filter });
 
   return (
     <div className="mt-11">

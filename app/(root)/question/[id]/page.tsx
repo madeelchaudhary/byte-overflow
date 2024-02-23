@@ -20,15 +20,20 @@ interface Props {
   params: {
     id: string;
   };
+  searchParams: {
+    [key: string]: any;
+  };
 }
 
-const page = async ({ params: { id } }: Props) => {
+const page = async ({ params: { id }, searchParams }: Props) => {
   const { userId } = auth();
 
   const [question, user] = await Promise.all([
     getQuestionById(id),
     userId ? getUserById(userId) : null,
   ]);
+
+  const filter = searchParams.filter || "";
 
   const {
     _id,
@@ -114,6 +119,7 @@ const page = async ({ params: { id } }: Props) => {
         questionId={id}
         totalAnswers={totalAnswers}
         userId={user?._id?.toString()}
+        filter={filter}
       />
 
       <AnswerForm />
