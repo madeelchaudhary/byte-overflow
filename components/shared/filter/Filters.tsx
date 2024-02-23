@@ -32,7 +32,7 @@ const Filters = ({ filters, className, wrapperClassName }: Props) => {
       params.set("filter", value);
     }
 
-    router.push(`${pathname}?${params.toString()}`);
+    router.push(`${pathname}?${params.toString()}`, { scroll: false });
   }
 
   return (
