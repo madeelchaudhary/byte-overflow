@@ -63,7 +63,7 @@ const PaginationMenu = ({ total, pageSize = PAGE_SIZE }: Props) => {
                 className={clsx(
                   "light-border-2 text-dark200_light800 body-medium border",
                   currentPage === page &&
-                    "primary-gradient border-primary-500 text-light-900"
+                    "primary-gradient pointer-events-none border-primary-500 text-light-900"
                 )}
               >
                 {page}
