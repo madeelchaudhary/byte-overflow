@@ -17,7 +17,7 @@ interface Props {
   itemId: string;
   upvotes: string[];
   downvotes: string[];
-  userId: string;
+  userId?: string;
   hasSaved?: boolean;
 }
 
@@ -29,8 +29,8 @@ const Votes = ({
   userId,
   hasSaved,
 }: Props) => {
-  const hasUpvoted = upvotes.includes(userId);
-  const hasDownvoted = downvotes.includes(userId);
+  const hasUpvoted = upvotes.includes(userId || "");
+  const hasDownvoted = downvotes.includes(userId || "");
 
   async function handleVote(action: "upvote" | "downvote") {
     if (!userId) return;
@@ -56,6 +56,7 @@ const Votes = ({
   }
 
   async function handleSave() {
+    if (!userId) return;
     try {
       await saveQuestion(itemId, userId);
     } catch (error) {}
