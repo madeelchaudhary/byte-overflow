@@ -22,7 +22,7 @@ export default async function Home({ searchParams }: Props) {
   const page = searchParams.page ? Number(searchParams.page) : 1;
 
   const result = await getQuestions({ search: q, filter, page });
-  const questions = result.questions;
+  const { questions, totalQuestions } = result;
 
   return (
     <>
@@ -66,7 +66,7 @@ export default async function Home({ searchParams }: Props) {
       </div>
 
       <div className="mt-10">
-        <PaginationMenu total={result.totalQuestions} pageSize={10} />
+        <PaginationMenu total={totalQuestions} />
       </div>
     </>
   );

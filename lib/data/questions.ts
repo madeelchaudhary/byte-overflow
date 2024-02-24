@@ -39,7 +39,11 @@ export const getQuestions = async ({
     } else if (filter === "frequent") {
       sortOptions["views"] = -1;
     } else if (filter === "unanswered") {
-      query.$or = [{ answers: { $size: 0 } }, { answers: { $exists: false } }];
+      if (!query.$or) query.$or = [];
+      query.$ro.push(
+        { answers: { $size: 0 } },
+        { answers: { $exists: false } }
+      );
       sortOptions["createdAt"] = -1;
     }
   } else {
