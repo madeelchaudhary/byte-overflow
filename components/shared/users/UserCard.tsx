@@ -1,20 +1,12 @@
-import { Badge } from "@/components/ui/badge";
-import { getUserRelatedTags } from "@/lib/data/tag";
 import Image from "next/image";
 import Link from "next/link";
-import React from "react";
+
+import { Badge } from "@/components/ui/badge";
+import { getUserRelatedTags } from "@/lib/data/tag";
+import { UserData } from "@/lib/types";
 import TagBadge from "../TagBadge";
 
-interface Props {
-  _id: string;
-  clerkId: string;
-  username: string;
-  profile: {
-    name: string;
-    avatar: string;
-    bio: string;
-  };
-}
+interface Props extends UserData {}
 
 const UserCard = async ({ clerkId, profile, username }: Props) => {
   const tags = await getUserRelatedTags({ userId: clerkId });
