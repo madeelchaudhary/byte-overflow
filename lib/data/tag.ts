@@ -105,6 +105,12 @@ export const getTagsWithQuestionsCount = async ({
       {
         $sort: sortOptions,
       },
+      {
+        $skip: (page - 1) * pageSize,
+      },
+      {
+        $limit: pageSize,
+      },
     ]);
 
     const totalTags = await Tag.countDocuments(searchQuery);

@@ -18,7 +18,7 @@ const page = async ({ searchParams }: Props) => {
   const page = searchParams.page ? Number(searchParams.page) : 1;
 
   const result = await getTagsWithQuestionsCount({ search: q, filter, page });
-  const tags = result.tags;
+  const { tags, totalTags } = result;
 
   return (
     <>
@@ -49,7 +49,7 @@ const page = async ({ searchParams }: Props) => {
       </section>
 
       <div className="mt-10">
-        <PaginationMenu total={result.totalTags} />
+        <PaginationMenu total={totalTags} />
       </div>
     </>
   );
