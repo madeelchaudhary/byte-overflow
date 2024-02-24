@@ -8,6 +8,7 @@ import LocalSearch from "@/components/shared/search/LocalSearch";
 import { Button } from "@/components/ui/button";
 import { HomePageFilters } from "@/constants/filters";
 import { getQuestions } from "@/lib/data/questions";
+import PaginationMenu from "@/components/shared/PaginationMenu";
 
 interface Props {
   searchParams: {
@@ -18,7 +19,10 @@ interface Props {
 export default async function Home({ searchParams }: Props) {
   const q = searchParams.q || "";
   const filter = searchParams.filter || "";
-  const questions = await getQuestions({ search: q, filter });
+  const page = searchParams.page ? Number(searchParams.page) : 1;
+
+  const result = await getQuestions({ search: q, filter, page });
+  const questions = result.questions;
 
   return (
     <>
@@ -59,6 +63,10 @@ export default async function Home({ searchParams }: Props) {
         ) : (
           <NoResultsFound />
         )}
+      </div>
+
+      <div className="mt-10">
+        <PaginationMenu total={result.totalQuestions} pageSize={10} />
       </div>
     </>
   );
