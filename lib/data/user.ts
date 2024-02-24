@@ -5,6 +5,7 @@ import dbConnect from "../dbConnect";
 import { FilterQuery } from "mongoose";
 import { AnswerData, QuestionData, UserData } from "../types";
 import Answer from "@/db/answer.model";
+import { PAGE_SIZE } from "@/constants";
 
 interface GetUsersParams {
   page?: number;
@@ -29,7 +30,7 @@ interface GetUserDocumentsParams {
 
 export const getUsers = async ({
   page = 1,
-  pageSize = 10,
+  pageSize = PAGE_SIZE,
   search,
   filter,
 }: GetUsersParams) => {
@@ -63,11 +64,16 @@ export const getUsers = async ({
     .skip((page - 1) * pageSize)
     .sort(sortOptions);
 
+  const totalUsers = await User.countDocuments(searchQuery);
+
   const users = result.map((user) => {
     return JSON.parse(JSON.stringify(user));
-  });
+  }) as UserData[];
 
-  return users;
+  return {
+    users,
+    totalUsers,
+  };
 };
 
 export const getUserByClerkId = async (clerkId: string) => {
