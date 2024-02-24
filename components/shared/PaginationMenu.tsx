@@ -18,17 +18,22 @@ import { PAGE_SIZE } from "@/constants";
 interface Props {
   total: number;
   pageSize?: number;
+  queryTerm?: string;
 }
 
-const PaginationMenu = ({ total, pageSize = PAGE_SIZE }: Props) => {
+const PaginationMenu = ({
+  total,
+  pageSize = PAGE_SIZE,
+  queryTerm = "page",
+}: Props) => {
   const searchParams = useSearchParams();
   const pathname = usePathname();
 
-  const currentPage = Number(searchParams.get("page")) || 1;
+  const currentPage = Number(searchParams.get(queryTerm)) || 1;
 
   const createPageURL = (pageNumber: number | string) => {
     const params = new URLSearchParams(searchParams);
-    params.set("page", pageNumber.toString());
+    params.set(queryTerm, pageNumber.toString());
     return `${pathname}?${params.toString()}`;
   };
 
