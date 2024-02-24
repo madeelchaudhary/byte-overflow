@@ -1,4 +1,5 @@
 import NoResultsFound from "@/components/shared/NoResultsFound";
+import PaginationMenu from "@/components/shared/PaginationMenu";
 import QuestionCard from "@/components/shared/questions/QuestionCard";
 import LocalSearch from "@/components/shared/search/LocalSearch";
 import { getQuestionsByTagId } from "@/lib/data/tag";
@@ -15,11 +16,13 @@ interface Props {
 
 const page = async ({ params: { id }, searchParams }: Props) => {
   const q = searchParams.q || "";
-  const result = await getQuestionsByTagId({ tagId: id, search: q });
+  const page = searchParams.page ? Number(searchParams.page) : 1;
+
+  const result = await getQuestionsByTagId({ tagId: id, search: q, page });
 
   if (!result) return notFound();
 
-  const { questions, tagTitle } = result;
+  const { questions, tagTitle, totalQuestions } = result;
 
   return (
     <>
@@ -50,6 +53,10 @@ const page = async ({ params: { id }, searchParams }: Props) => {
             linkText="Explore Tags"
           />
         )}
+      </div>
+
+      <div className="mt-10">
+        <PaginationMenu total={totalQuestions} />
       </div>
     </>
   );

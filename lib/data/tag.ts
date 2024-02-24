@@ -4,6 +4,7 @@ import User from "@/db/user.model";
 import dbConnect from "../dbConnect";
 import { FilterQuery } from "mongoose";
 import { PAGE_SIZE } from "@/constants";
+import { QuestionData } from "../types";
 
 interface GetUserTagsParams {
   userId: string;
@@ -134,7 +135,7 @@ export const getTagsWithQuestionsCount = async ({
 export const getQuestionsByTagId = async ({
   tagId,
   page = 1,
-  pageSize = 10,
+  pageSize = PAGE_SIZE,
   search,
 }: GetQuestionsByTagParams) => {
   await dbConnect();
@@ -167,9 +168,14 @@ export const getQuestionsByTagId = async ({
     return null;
   }
 
-  const questions = JSON.parse(JSON.stringify(tag.questions));
+  const totalQuestions = await Question.countDocuments({
+    tags: tagId,
+    ...searchQuery,
+  });
 
-  return { tagId: tag._id, tagTitle: tag.name, questions };
+  const questions = JSON.parse(JSON.stringify(tag.questions)) as QuestionData[];
+
+  return { tagId: tag._id, tagTitle: tag.name, questions, totalQuestions };
 };
 
 export const getHotTags = async ({ page = 1, pageSize = 5 }) => {
