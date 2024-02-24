@@ -3,6 +3,7 @@ import Question, { IQuestion } from "@/db/question.model";
 import User from "@/db/user.model";
 import dbConnect from "../dbConnect";
 import { FilterQuery } from "mongoose";
+import { PAGE_SIZE } from "@/constants";
 
 interface GetUserTagsParams {
   userId: string;
@@ -50,6 +51,8 @@ export const getUserRelatedTags = async ({
 export const getTagsWithQuestionsCount = async ({
   search,
   filter,
+  page = 1,
+  pageSize = PAGE_SIZE,
 }: GetTagsParams) => {
   try {
     await dbConnect();
@@ -104,7 +107,18 @@ export const getTagsWithQuestionsCount = async ({
       },
     ]);
 
-    return tagsWithQuestionsCount;
+    const totalTags = await Tag.countDocuments(searchQuery);
+
+    return {
+      tags: tagsWithQuestionsCount as {
+        _id: string;
+        name: string;
+        description: string;
+        questionsCount: number;
+        createdAt: Date;
+      }[],
+      totalTags,
+    };
   } catch (error) {
     console.error("Error:", error);
     throw error;
