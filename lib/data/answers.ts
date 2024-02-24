@@ -1,4 +1,6 @@
+import { PAGE_SIZE } from "@/constants";
 import Answer from "@/db/answer.model";
+import { AnswerData } from "../types";
 
 interface GetAnswersParams {
   questionId: string;
@@ -8,7 +10,7 @@ interface GetAnswersParams {
 }
 
 export async function getAnswers(params: GetAnswersParams) {
-  const { questionId, page = 1, pageSize = 10, filter } = params;
+  const { questionId, page = 1, pageSize = PAGE_SIZE, filter } = params;
 
   const sortOptions: Record<string, any> = {};
 
@@ -26,11 +28,15 @@ export async function getAnswers(params: GetAnswersParams) {
     sortOptions["createdAt"] = -1;
   }
 
-  const answers = await Answer.find({ question: questionId })
+  const result = await Answer.find({ question: questionId })
     .sort(sortOptions)
     .skip((page - 1) * pageSize)
     .limit(pageSize)
     .populate("author", "profile clerkId email username");
 
-  return JSON.parse(JSON.stringify(answers));
+  const totalAnswers = await Answer.countDocuments({ question: questionId });
+
+  const answers = JSON.parse(JSON.stringify(result)) as AnswerData[];
+
+  return { answers, totalAnswers };
 }

@@ -1,4 +1,5 @@
 import HtmlParser from "@/components/shared/HtmlParser";
+import PaginationMenu from "@/components/shared/PaginationMenu";
 import Votes from "@/components/shared/Votes";
 import Filters from "@/components/shared/filter/Filters";
 import { AnswerFilters } from "@/constants/filters";
@@ -10,18 +11,18 @@ import React from "react";
 
 interface Props {
   questionId: string;
-  totalAnswers: number;
-  filter?: string;
-  userId: string;
+  userId?: string;
+  searchParams: {
+    [key: string]: any;
+  };
 }
 
-const AllAnswers = async ({
-  questionId,
-  totalAnswers,
-  userId,
-  filter,
-}: Props) => {
-  const answers = await getAnswers({ questionId, filter });
+const AllAnswers = async ({ questionId, userId, searchParams }: Props) => {
+  const filter = searchParams.filter || "";
+  const page = searchParams.page ? Number(searchParams.page) : 1;
+
+  const result = await getAnswers({ questionId, filter, page });
+  const { answers, totalAnswers } = result;
 
   return (
     <div className="mt-11">
@@ -72,6 +73,10 @@ const AllAnswers = async ({
             </div>
           );
         })}
+      </div>
+
+      <div className="mt-10">
+        <PaginationMenu total={totalAnswers} />
       </div>
     </div>
   );

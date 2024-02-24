@@ -40,7 +40,7 @@ export const getQuestions = async ({
       sortOptions["views"] = -1;
     } else if (filter === "unanswered") {
       if (!query.$or) query.$or = [];
-      query.$ro.push(
+      query.$or.push(
         { answers: { $size: 0 } },
         { answers: { $exists: false } }
       );
@@ -69,17 +69,22 @@ export const getQuestions = async ({
 export const getQuestionById = async (id: string) => {
   await dbConnect();
 
-  const question = await Question.findById(id)
+  const result = await Question.findById(id)
     .populate("tags", undefined, Tag)
     .populate("author", undefined, User);
 
-  if (!question) {
+  if (!result) {
     return null;
   }
 
-  const totalAnswers = await Answer.find({ question: id }).countDocuments();
+  const totalAnswers = await Answer.countDocuments({ question: id });
 
-  return { ...JSON.parse(JSON.stringify(question)), totalAnswers };
+  const question = JSON.parse(JSON.stringify(result)) as QuestionData;
+
+  return {
+    question,
+    totalAnswers,
+  };
 };
 
 export const getHotQuestions = async ({ page = 1, pageSize = 5 }) => {
