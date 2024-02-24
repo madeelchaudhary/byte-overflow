@@ -89,7 +89,7 @@ export const getUserByClerkId = async (clerkId: string) => {
 export const getSavedQuestions = async ({
   clerkId,
   page = 1,
-  pageSize = 10,
+  pageSize = PAGE_SIZE,
   search,
   filter,
 }: GetSavedQuestionsParams) => {
@@ -139,7 +139,19 @@ export const getSavedQuestions = async ({
 
   if (!user) return null;
 
-  return JSON.parse(JSON.stringify(user.saved));
+  const totalSavedQuestions = await Question.countDocuments({
+    author: user._id,
+    ...searchQuery,
+  });
+
+  const questions = user.saved.map((question) => {
+    return JSON.parse(JSON.stringify(question));
+  }) as QuestionData[];
+
+  return {
+    questions,
+    totalSavedQuestions,
+  };
 };
 
 export const getUserInfo = async (clerkId: string) => {
