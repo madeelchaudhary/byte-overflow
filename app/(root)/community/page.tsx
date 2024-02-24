@@ -1,4 +1,5 @@
 import NoResultsFound from "@/components/shared/NoResultsFound";
+import PaginationMenu from "@/components/shared/PaginationMenu";
 import Filters from "@/components/shared/filter/Filters";
 import LocalSearch from "@/components/shared/search/LocalSearch";
 import UserCard from "@/components/shared/users/UserCard";
@@ -14,8 +15,10 @@ interface Props {
 const page = async ({ searchParams }: Props) => {
   const q = searchParams.q || "";
   const filter = searchParams.filter || "";
+  const page = searchParams.page ? Number(searchParams.page) : 1;
 
-  const users = await getUsers({ search: q, filter });
+  const result = await getUsers({ search: q, filter, page });
+  const users = result.users;
 
   return (
     <>
@@ -44,6 +47,10 @@ const page = async ({ searchParams }: Props) => {
           />
         )}
       </section>
+
+      <div className="mt-10">
+        <PaginationMenu total={result.totalUsers} />
+      </div>
     </>
   );
 };
