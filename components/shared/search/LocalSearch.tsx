@@ -34,6 +34,7 @@ const LocalSearch = ({
     if (search.trim()) {
       const query = search.trim();
       params.set("q", query);
+      params.delete("page");
       const url = `${pathname}?${params.toString()}`;
       router.push(url);
     } else {
