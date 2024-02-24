@@ -196,7 +196,7 @@ export const getUserInfo = async (clerkId: string) => {
 export const getUserQuestions = async ({
   userId,
   page = 1,
-  pageSize = 10,
+  pageSize = PAGE_SIZE,
 }: GetUserDocumentsParams) => {
   await dbConnect();
 
@@ -207,17 +207,22 @@ export const getUserQuestions = async ({
     .populate("tags")
     .populate("author");
 
+  const totalQuestions = await Question.countDocuments({ author: userId });
+
   const questions = result.map((question) => {
     return JSON.parse(JSON.stringify(question));
-  });
+  }) as QuestionData[];
 
-  return questions as QuestionData[];
+  return {
+    questions,
+    totalQuestions,
+  };
 };
 
 export const getUserAnswers = async ({
   userId,
   page = 1,
-  pageSize = 10,
+  pageSize = PAGE_SIZE,
 }: GetUserDocumentsParams) => {
   await dbConnect();
 
@@ -228,9 +233,14 @@ export const getUserAnswers = async ({
     .populate("question")
     .populate("author");
 
+  const totalAnswers = await Answer.countDocuments({ author: userId });
+
   const answers = result.map((answer) => {
     return JSON.parse(JSON.stringify(answer));
-  });
+  }) as AnswerData[];
 
-  return answers as AnswerData[];
+  return {
+    answers,
+    totalAnswers,
+  };
 };

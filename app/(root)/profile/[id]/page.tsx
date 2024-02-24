@@ -1,15 +1,24 @@
+import { SignedIn, auth } from "@clerk/nextjs";
+import Image from "next/image";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+
 import ProfileInfoItem from "@/components/shared/users/ProfileInfoItem";
 import ProfileTabs from "@/components/shared/users/ProfileTabs";
 import UserStats from "@/components/shared/users/UserStats";
 import { Button } from "@/components/ui/button";
 import { getUserInfo } from "@/lib/data/user";
-import { SignedIn, auth } from "@clerk/nextjs";
-import Image from "next/image";
-import Link from "next/link";
-import { notFound } from "next/navigation";
-import React from "react";
 
-const page = async ({ params: { id } }: { params: { id: string } }) => {
+interface Props {
+  params: {
+    id: string;
+  };
+  searchParams: {
+    [key: string]: any;
+  };
+}
+
+const page = async ({ params: { id }, searchParams }: Props) => {
   const { userId } = auth();
 
   const result = await getUserInfo(id);
@@ -88,7 +97,11 @@ const page = async ({ params: { id } }: { params: { id: string } }) => {
       <UserStats totalQuestions={totalQuestions} totalAnswers={totalAnswers} />
 
       <div className="mt-10 flex gap-10">
-        <ProfileTabs userId={user._id} clerkId={userId} />
+        <ProfileTabs
+          searchParams={searchParams}
+          userId={user._id}
+          clerkId={userId}
+        />
       </div>
     </>
   );

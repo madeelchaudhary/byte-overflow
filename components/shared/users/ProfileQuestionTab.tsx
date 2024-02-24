@@ -2,14 +2,21 @@ import { getUserQuestions } from "@/lib/data/user";
 import React from "react";
 import QuestionCard from "../questions/QuestionCard";
 import NoResultsFound from "../NoResultsFound";
+import PaginationMenu from "../PaginationMenu";
 
 interface Props {
   userId: string;
   clerkId: string | null;
+  searchParams: {
+    [key: string]: any;
+  };
 }
 
-const ProfileQuestionTab = async ({ userId, clerkId }: Props) => {
-  const questions = await getUserQuestions({ userId });
+const ProfileQuestionTab = async ({ userId, clerkId, searchParams }: Props) => {
+  const page = searchParams.qPage ? Number(searchParams.qPage) : 1;
+
+  const result = await getUserQuestions({ userId, page });
+  const { questions, totalQuestions } = result;
   return (
     <>
       {questions.length > 0 ? (
@@ -24,6 +31,10 @@ const ProfileQuestionTab = async ({ userId, clerkId }: Props) => {
           linkText="Ask a question"
         />
       )}
+
+      <div className="mt-10">
+        <PaginationMenu total={totalQuestions} queryTerm="qPage" />
+      </div>
     </>
   );
 };

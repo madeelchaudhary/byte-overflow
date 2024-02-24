@@ -6,9 +6,12 @@ import ProfileAnswerTab from "./ProfileAnswerTab";
 interface Props {
   userId: string;
   clerkId: string | null;
+  searchParams: {
+    [key: string]: any;
+  };
 }
 
-const ProfileTabs = ({ userId, clerkId }: Props) => {
+const ProfileTabs = ({ userId, clerkId, searchParams }: Props) => {
   return (
     <Tabs defaultValue="topPosts" className="flex-1">
       <TabsList className="background-light800_dark400 min-h-[42px] p-1">
@@ -23,13 +26,21 @@ const ProfileTabs = ({ userId, clerkId }: Props) => {
         value="topPosts"
         className="flex w-full flex-col gap-6 data-[state=active]:mt-5"
       >
-        <ProfileQuestionTab userId={userId} clerkId={clerkId} />
+        <ProfileQuestionTab
+          userId={userId}
+          clerkId={clerkId}
+          searchParams={searchParams}
+        />
       </TabsContent>
       <TabsContent
         value="answers"
         className="flex w-full flex-col gap-6 data-[state=active]:mt-5"
       >
-        <ProfileAnswerTab userId={userId} clerkId={clerkId} />
+        <ProfileAnswerTab
+          userId={userId}
+          clerkId={clerkId}
+          searchParams={searchParams}
+        />
       </TabsContent>
     </Tabs>
   );
