@@ -35,6 +35,10 @@ const PaginationMenu = ({ total, pageSize = PAGE_SIZE }: Props) => {
   const totalPages = Math.ceil(total / pageSize);
   const pages = generatePagination(currentPage, totalPages);
 
+  if (totalPages <= 1) {
+    return null;
+  }
+
   return (
     <Pagination className="justify-end">
       <PaginationContent className="gap-2">
