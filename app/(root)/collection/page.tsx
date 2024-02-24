@@ -7,6 +7,7 @@ import QuestionCard from "@/components/shared/questions/QuestionCard";
 import LocalSearch from "@/components/shared/search/LocalSearch";
 import { QuestionFilters } from "@/constants/filters";
 import { getSavedQuestions } from "@/lib/data/user";
+import PaginationMenu from "@/components/shared/PaginationMenu";
 
 interface Props {
   searchParams: {
@@ -23,11 +24,20 @@ const page = async ({ searchParams }: Props) => {
 
   const q = searchParams.q || "";
   const filter = searchParams.filter || "";
-  const questions = await getSavedQuestions({
+  const page = searchParams.page ? Number(searchParams.page) : 1;
+
+  const result = await getSavedQuestions({
     clerkId: userId,
     search: q,
     filter,
+    page,
   });
+
+  if (!result) {
+    return notFound();
+  }
+
+  const { questions, totalSavedQuestions } = result;
 
   return (
     <>
@@ -60,6 +70,10 @@ const page = async ({ searchParams }: Props) => {
             linkText="Explore Questions"
           />
         )}
+      </div>
+
+      <div className="mt-10">
+        <PaginationMenu total={totalSavedQuestions} />
       </div>
     </>
   );
