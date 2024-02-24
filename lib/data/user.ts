@@ -139,10 +139,32 @@ export const getSavedQuestions = async ({
 
   if (!user) return null;
 
-  const totalSavedQuestions = await Question.countDocuments({
-    author: user._id,
-    ...searchQuery,
-  });
+  let aggregateSearchQuery: FilterQuery<IQuestion> = {};
+
+  if (search)
+    aggregateSearchQuery = {
+      "question.title": { $regex: search, $options: "i" },
+      "question.description": { $regex: search, $options: "i" },
+    };
+
+  const savedQuestions = await User.aggregate([
+    { $match: { _id: user._id } },
+
+    {
+      $lookup: {
+        from: "questions",
+        localField: "saved",
+        foreignField: "_id",
+        as: "question",
+      },
+    },
+    { $unwind: "$question" },
+    { $match: aggregateSearchQuery },
+    { $count: "totalSavedQuestions" },
+  ]);
+
+  const totalSavedQuestions =
+    savedQuestions.length > 0 ? savedQuestions[0].totalSavedQuestions : 0;
 
   const questions = user.saved.map((question) => {
     return JSON.parse(JSON.stringify(question));
