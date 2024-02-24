@@ -8,6 +8,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { ProfileSchema } from "../validations";
 import { redirect } from "next/navigation";
+import { UserData } from "../types";
 
 interface CreateUserParams {
   clerkId: string;
@@ -35,7 +36,9 @@ export const getUserById = async (clerkId: string) => {
     clerkId: clerkId,
   });
 
-  return user;
+  if (!user) return null;
+
+  return JSON.parse(JSON.stringify(user)) as UserData;
 };
 
 export const createUser = async ({

@@ -11,6 +11,7 @@ import Image from "next/image";
 import Link from "next/link";
 import AllAnswers from "../_components/AllAnswers";
 import AnswerForm from "../_components/AnswerForm";
+import { notFound } from "next/navigation";
 
 const HtmlParser = dynamic(() => import("@/components/shared/HtmlParser"), {
   ssr: false,
@@ -28,12 +29,16 @@ interface Props {
 const page = async ({ params: { id }, searchParams }: Props) => {
   const { userId } = auth();
 
-  const [question, user] = await Promise.all([
+  const [result, user] = await Promise.all([
     getQuestionById(id),
     userId ? getUserById(userId) : null,
   ]);
 
-  const filter = searchParams.filter || "";
+  if (!result) {
+    return notFound();
+  }
+
+  const { question, totalAnswers } = result;
 
   const {
     _id,
@@ -43,7 +48,6 @@ const page = async ({ params: { id }, searchParams }: Props) => {
     author,
     upvotes,
     downvotes,
-    totalAnswers,
     views,
     createdAt,
   } = question;
@@ -71,7 +75,7 @@ const page = async ({ params: { id }, searchParams }: Props) => {
             <Votes
               type="question"
               itemId={_id}
-              userId={user?._id?.toString()}
+              userId={user?._id}
               upvotes={upvotes}
               downvotes={downvotes}
               hasSaved={user ? user.saved.includes(_id) : undefined}
@@ -117,9 +121,8 @@ const page = async ({ params: { id }, searchParams }: Props) => {
 
       <AllAnswers
         questionId={id}
-        totalAnswers={totalAnswers}
-        userId={user?._id?.toString()}
-        filter={filter}
+        userId={user?._id}
+        searchParams={searchParams}
       />
 
       <AnswerForm />
