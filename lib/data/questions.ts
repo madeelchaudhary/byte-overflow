@@ -5,6 +5,7 @@ import User from "@/db/user.model";
 import Answer from "@/db/answer.model";
 import { QuestionData } from "../types";
 import { FilterQuery } from "mongoose";
+import { PAGE_SIZE } from "@/constants";
 
 interface GetQuestionParams {
   page?: number;
@@ -15,7 +16,7 @@ interface GetQuestionParams {
 
 export const getQuestions = async ({
   page = 1,
-  pageSize = 10,
+  pageSize = PAGE_SIZE,
   search = "",
   filter,
 }: GetQuestionParams) => {
@@ -52,11 +53,13 @@ export const getQuestions = async ({
     .skip((page - 1) * pageSize)
     .limit(pageSize);
 
+  const totalQuestions = await Question.countDocuments(query);
+
   const questions = result.map((question) => {
     return JSON.parse(JSON.stringify(question));
-  });
+  }) as QuestionData[];
 
-  return questions;
+  return { questions, totalQuestions };
 };
 
 export const getQuestionById = async (id: string) => {
