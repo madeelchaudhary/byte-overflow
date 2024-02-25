@@ -28,7 +28,10 @@ const GlobalSearch = () => {
         router.push(url);
       } else {
         const params = new URLSearchParams(searchParams);
-        if (!params.get("gq")) return;
+        if (!params.get("gq")) {
+          if (isOpen) setIsOpen(false);
+          return;
+        }
         params.delete("gq");
         const url = `${pathname}?${params.toString()}`;
         if (isOpen) setIsOpen(false);
