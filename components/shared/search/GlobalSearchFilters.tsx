@@ -12,7 +12,9 @@ const GlobalSearchFilters = () => {
 
   const handleFilter = (filter: string) => {
     const params = new URLSearchParams(searchParams);
-    if (filter) {
+    if (filter && filter === params.get("gf")) {
+      params.delete("gf");
+    } else if (filter) {
       params.set("gf", filter);
     } else {
       params.delete("gf");
