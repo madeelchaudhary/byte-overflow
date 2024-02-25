@@ -1,46 +1,27 @@
 "use client";
 import { useEffect, useState } from "react";
-import { ReloadIcon } from "@radix-ui/react-icons";
+import { ReloadIcon, ExclamationTriangleIcon } from "@radix-ui/react-icons";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import GlobalSearchFilters from "./GlobalSearchFilters";
-
-const DUMMY_RESULTS = [
-  {
-    _id: "1",
-    title: "Title 1",
-    description: "Description 1",
-    type: "question",
-  },
-  {
-    _id: "2",
-    title: "Title 2",
-    description: "Description 2",
-    type: "question",
-  },
-  {
-    _id: "3",
-    title: "Title 3",
-    description: "Description 3",
-    type: "question",
-  },
-  {
-    _id: "4",
-    title: "Title 4",
-    description: "Description 4",
-    type: "question",
-  },
-  { _id: "5", title: "Tag 1", description: "Description 5", type: "tag" },
-];
+import { globalSearch } from "@/lib/actions/commons";
 
 function getItemLink(item: any) {
-  return `${item.type}/${item._id}`;
+  switch (item.type) {
+    case "question":
+      return `/question/${item._id}`;
+    case "tag":
+      return `/tags/${item._id}`;
+    case "answer":
+      return `/question/${item.question}#answer-${item._id}`;
+  }
+  return "/";
 }
 
 const GlobalSearchResult = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const [results, setResults] = useState(DUMMY_RESULTS);
+  const [results, setResults] = useState([]);
   const [error, setError] = useState<string | null>(null);
 
   const searchParams = useSearchParams();
@@ -51,8 +32,8 @@ const GlobalSearchResult = () => {
     const fetchResults = async () => {
       try {
         setIsLoading(true);
-        const res = await fetch(`/api/search?query=${query}`);
-        const data = await res.json();
+        const res = await globalSearch(query!, filter!);
+        const data = res || [];
         setResults(data);
         setIsLoading(false);
       } catch (error) {
@@ -61,9 +42,9 @@ const GlobalSearchResult = () => {
       }
     };
 
-    // if (query) {
-    //   fetchResults();
-    // }
+    if (query) {
+      fetchResults();
+    }
   }, [query, filter]);
 
   return (
@@ -75,6 +56,13 @@ const GlobalSearchResult = () => {
           Top Match
         </p>
 
+        {error && (
+          <div className="flex-center flex-col px-5">
+            <ExclamationTriangleIcon className="my-2 h-10 w-10 text-primary-500" />
+            <p className="text-dark200_light800 body-regular">{error}</p>
+          </div>
+        )}
+
         {isLoading && (
           <div className="flex-center flex-col px-5">
             <ReloadIcon className="my-2 h-10 w-10 animate-spin text-primary-500" />
@@ -83,7 +71,7 @@ const GlobalSearchResult = () => {
             </p>
           </div>
         )}
-        {!isLoading && (
+        {!isLoading && !error && (
           <div className="flex flex-col gap-2">
             {results.length === 0 && (
               <div className="px-5 py-2.5 text-center">
@@ -108,10 +96,10 @@ const GlobalSearchResult = () => {
                 />
                 <div className="flex flex-col">
                   <p className="body-medium text-dark200_light800 line-clamp-1">
-                    {item.title}
+                    {item.title || item.name || item.description}
                   </p>
                   <p className="text-light400_light500 small-medium mt-1 font-bold capitalize">
-                    {item.description}
+                    {item.type}
                   </p>
                 </div>
               </Link>
