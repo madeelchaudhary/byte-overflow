@@ -22,35 +22,43 @@ const LocalSearch = ({
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const q = searchParams.get("q");
-  const [search, setSearch] = useState(q || "");
+  const query = searchParams.get("q");
+  const [search, setSearch] = useState(query || "");
 
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const onSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value);
   };
 
-  const onSearch = useCallback(() => {
-    const params = new URLSearchParams(searchParams);
-    if (search.trim()) {
-      const query = search.trim();
-      params.set("q", query);
-      params.delete("page");
-      const url = `${pathname}?${params.toString()}`;
-      router.push(url);
-    } else {
-      params.delete("q");
-      const url = `${pathname}?${params.toString()}`;
-      router.push(url);
-    }
-  }, [search, pathname, router, searchParams]);
+  const handleSearch = useCallback(
+    (term: string) => {
+      if (term.trim()) {
+        const params = new URLSearchParams(searchParams);
+        params.set("q", term);
+        params.delete("page");
+        const url = `${pathname}?${params.toString()}`;
+        router.push(url);
+      } else {
+        const params = new URLSearchParams(searchParams);
+        if (!params.get("q")) return;
+        params.delete("q");
+        const url = `${pathname}?${params.toString()}`;
+        router.push(url);
+      }
+    },
+    [pathname, router, searchParams]
+  );
+
+  useEffect(() => {
+    setSearch(query || "");
+  }, [query, pathname]);
 
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
-      onSearch();
+      handleSearch(search);
     }, 300);
 
     return () => clearTimeout(delayDebounceFn);
-  }, [search, onSearch]);
+  }, [search, handleSearch]);
 
   return (
     <div
@@ -67,10 +75,10 @@ const LocalSearch = ({
       )}
       <Input
         placeholder={placeholder}
-        className="paragraph-regular no-focus placeholder absolute h-full w-full border-none bg-transparent pl-10 shadow-none outline-none"
+        className="paragraph-regular no-focus placeholder text-dark400_light700 absolute h-full w-full border-none bg-transparent pl-10 shadow-none outline-none"
         type="text"
         value={search}
-        onChange={handleSearch}
+        onChange={onSearch}
       />
       {imgSide === "right" && (
         <Image
