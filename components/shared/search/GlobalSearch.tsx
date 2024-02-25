@@ -1,6 +1,6 @@
-import { Input } from "@/components/ui/input";
 import Image from "next/image";
-import React from "react";
+
+import { Input } from "@/components/ui/input";
 
 const GlobalSearch = () => {
   return (
@@ -11,11 +11,11 @@ const GlobalSearch = () => {
           width={24}
           height={24}
           alt="Search"
-          className="cursor-pointer"
+          className="pointer-events-none"
         />
         <Input
           placeholder="Search"
-          className="paragraph-regular no-focus placeholder background-light800_darkgradient border-none shadow-none outline-none"
+          className="paragraph-regular no-focus placeholder absolute h-full w-full border-none bg-transparent pl-10 shadow-none outline-none"
           type="text"
         />
       </div>
