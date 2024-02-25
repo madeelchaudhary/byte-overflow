@@ -1,17 +1,19 @@
-import QuestionForm from "@/app/(root)/ask/_components/QuestionForm";
-import { getQuestionById } from "@/lib/data/questions";
 import { auth } from "@clerk/nextjs";
 import { notFound, redirect } from "next/navigation";
-import React from "react";
+
+import QuestionForm from "@/app/(root)/ask/_components/QuestionForm";
+import { getQuestionById } from "@/lib/data/questions";
 
 const page = async ({ params: { id } }: { params: { id: string } }) => {
   const { userId } = auth();
 
   if (!userId) return redirect("/sign-in");
 
-  const question = await getQuestionById(id);
+  const result = await getQuestionById(id);
 
-  if (!question) return notFound();
+  if (!result) return notFound();
+
+  const { question } = result;
 
   return (
     <>
