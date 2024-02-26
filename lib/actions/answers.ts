@@ -53,7 +53,7 @@ export async function createAnswer(params: CreateAnswerParams) {
       user: user._id,
       question: questionId,
       answer: answer._id,
-      type: "answer",
+      action: "answer",
     });
 
     await Question.findByIdAndUpdate(questionId, {
