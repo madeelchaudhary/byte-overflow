@@ -10,6 +10,8 @@ import User, { IUser } from "@/db/user.model";
 import dbConnect from "@/lib/dbConnect";
 import APIError from "../api-error";
 import { AnswerSchema } from "../validations";
+import Interaction from "@/db/interaction.model";
+import { ANSWER_QUESTION_REPUTATION } from "@/constants";
 
 type CreateAnswerParams = z.infer<typeof AnswerSchema> & {
   questionId: string;
@@ -47,8 +49,20 @@ export async function createAnswer(params: CreateAnswerParams) {
       question: questionId,
     });
 
+    await Interaction.create({
+      user: user._id,
+      question: questionId,
+      answer: answer._id,
+      type: "answer",
+    });
+
     await Question.findByIdAndUpdate(questionId, {
       $push: { answers: answer._id },
+    });
+
+    await user.updateOne({
+      $push: { answers: answer._id },
+      $inc: { "profile.reputation": ANSWER_QUESTION_REPUTATION },
     });
 
     console.log("Creating answer...");
@@ -85,9 +99,18 @@ export const deleteAnswer = async (answerId: string, path?: string) => {
     }
 
     await Promise.all([
+      Interaction.deleteMany({ answer: answer._id }),
       User.findByIdAndUpdate(author._id, {
         $pull: { answers: answerId },
       }),
+      User.updateMany(
+        { upvotes: answer._id },
+        { $pull: { upvotes: answer._id } }
+      ),
+      User.updateMany(
+        { downvotes: answer._id },
+        { $pull: { downvotes: answer._id } }
+      ),
       Question.findByIdAndUpdate(answer.question, {
         $pull: { answers: answerId },
       }),
