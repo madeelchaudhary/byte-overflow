@@ -57,7 +57,10 @@ export const upvoteQuestion = async (questionId: string, userId: string) => {
       );
     }
 
-    if (action === "upvote") {
+    if (
+      action === "upvote" &&
+      question.author.toString() !== user._id.toString()
+    ) {
       const existingInteraction = await Interaction.findOne({
         user: user._id,
         question: question._id,
@@ -132,7 +135,10 @@ export const downvoteQuestion = async (questionId: string, userId: string) => {
       );
     }
 
-    if (action === "downvote") {
+    if (
+      action === "downvote" &&
+      question.author.toString() !== user._id.toString()
+    ) {
       const existingInteraction = await Interaction.findOne({
         user: user._id,
         question: question._id,
@@ -207,7 +213,10 @@ export const upvoteAnswer = async (answerId: string, userId: string) => {
       );
     }
 
-    if (action === "upvote") {
+    if (
+      action === "upvote" &&
+      answer.author.toString() !== user._id.toString()
+    ) {
       const existingInteraction = await Interaction.findOne({
         user: user._id,
         answer: answer._id,
@@ -282,7 +291,10 @@ export const downvoteAnswer = async (answerId: string, userId: string) => {
       );
     }
 
-    if (action === "downvote") {
+    if (
+      action === "downvote" &&
+      answer.author.toString() !== user._id.toString()
+    ) {
       const existingInteraction = await Interaction.findOne({
         user: user._id,
         answer: answer._id,
