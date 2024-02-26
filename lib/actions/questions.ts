@@ -13,6 +13,7 @@ import User from "@/db/user.model";
 import dbConnect from "@/lib/dbConnect";
 import APIError from "../api-error";
 import { QuestionSchema } from "../validations";
+import { ASK_QUESTION_REPUTATION } from "@/constants";
 
 type CreateQuestionParams = z.infer<typeof QuestionSchema>;
 type EditQuestionParams = z.infer<typeof QuestionSchema> & {
@@ -73,6 +74,18 @@ export async function createQuestion(params: CreateQuestionParams) {
     // await Promise.all(tagsDoc.map((tag) => tag.save()));
     question.tags = tagsDoc.map((tag) => tag._id);
 
+    await Interaction.create({
+      user: user._id,
+      question: question._id,
+      action: "ask_question",
+      tags: tagsDoc.map((tag) => tag._id),
+    });
+
+    await user.updateOne({
+      $push: { questions: question._id },
+      $inc: { "profile.reputation": ASK_QUESTION_REPUTATION },
+    });
+
     console.log("Creating question...");
     await question.save();
   } catch (error) {
@@ -113,6 +126,22 @@ export const deleteQuestion = async (questionId: string, path?: string) => {
         { $pull: { questions: question._id } }
       ),
       Interaction.deleteMany({ question: question._id }),
+      User.updateOne(
+        { _id: (question.author as any)._id },
+        { $pull: { questions: question._id } }
+      ),
+      User.updateMany(
+        { upvotes: question._id },
+        { $pull: { upvotes: question._id } }
+      ),
+      User.updateMany(
+        { downvotes: question._id },
+        { $pull: { downvotes: question._id } }
+      ),
+      User.updateMany(
+        { saved: question._id },
+        { $pull: { saved: question._id } }
+      ),
       question.deleteOne(),
     ]);
 
