@@ -8,7 +8,9 @@ import Interaction from "@/db/interaction.model";
 import APIError from "../api-error";
 import dbConnect from "../dbConnect";
 import {
+  DOWNVOTE_ANSWER_REPUTATION,
   DOWNVOTE_QUESTION_REPUTATION,
+  UPVOTE_ANSWER_REPUTATION,
   UPVOTE_QUESTION_REPUTATION,
 } from "@/constants";
 
@@ -178,20 +180,54 @@ export const upvoteAnswer = async (answerId: string, userId: string) => {
       throw new APIError("Answer not found", 404);
     }
 
+    let action: "upvote" | "none" = "none";
+
     if (answer.upvotes.includes(user._id)) {
       answer.upvotes = answer.upvotes.filter(
         (id) => id.toString() !== user._id.toString()
       );
+
+      user.upvotes = user.upvotes.filter(
+        (id) => id.toString() !== answer._id.toString()
+      );
     } else {
       answer.upvotes.push(user._id);
+      user.upvotes.push(answer._id);
+
+      action = "upvote";
     }
 
     if (answer.downvotes.includes(user._id)) {
       answer.downvotes = answer.downvotes.filter(
         (id) => id.toString() !== user._id.toString()
       );
+
+      user.downvotes = user.downvotes.filter(
+        (id) => id.toString() !== answer._id.toString()
+      );
     }
 
+    if (action === "upvote") {
+      const existingInteraction = await Interaction.findOne({
+        user: user._id,
+        answer: answer._id,
+        action: "upvote_answer",
+      });
+
+      if (!existingInteraction) {
+        await Interaction.create({
+          user: user._id,
+          answer: answer._id,
+          action: "upvote_answer",
+        });
+
+        await User.findByIdAndUpdate(answer.author, {
+          $inc: { "profile.reputation": UPVOTE_ANSWER_REPUTATION },
+        });
+      }
+    }
+
+    await user.save();
     await answer.save();
 
     revalidatePath(`/question/${answer.question.toString()}`);
@@ -219,20 +255,54 @@ export const downvoteAnswer = async (answerId: string, userId: string) => {
       throw new APIError("Answer not found", 404);
     }
 
+    let action: "downvote" | "none" = "none";
+
     if (answer.downvotes.includes(user._id)) {
       answer.downvotes = answer.downvotes.filter(
         (id) => id.toString() !== user._id.toString()
       );
+
+      user.downvotes = user.downvotes.filter(
+        (id) => id.toString() !== answer._id.toString()
+      );
     } else {
       answer.downvotes.push(user._id);
+      user.downvotes.push(answer._id);
+
+      action = "downvote";
     }
 
     if (answer.upvotes.includes(user._id)) {
       answer.upvotes = answer.upvotes.filter(
         (id) => id.toString() !== user._id.toString()
       );
+
+      user.upvotes = user.upvotes.filter(
+        (id) => id.toString() !== answer._id.toString()
+      );
     }
 
+    if (action === "downvote") {
+      const existingInteraction = await Interaction.findOne({
+        user: user._id,
+        answer: answer._id,
+        action: "downvote_answer",
+      });
+
+      if (!existingInteraction) {
+        await Interaction.create({
+          user: user._id,
+          answer: answer._id,
+          action: "downvote_answer",
+        });
+
+        await User.findByIdAndUpdate(answer.author, {
+          $inc: { "profile.reputation": -DOWNVOTE_ANSWER_REPUTATION },
+        });
+      }
+    }
+
+    await user.save();
     await answer.save();
 
     revalidatePath(`/question/${answer.question.toString()}`);
