@@ -6,6 +6,8 @@ import { FilterQuery } from "mongoose";
 import { AnswerData, QuestionData, UserData } from "../types";
 import Answer from "@/db/answer.model";
 import { PAGE_SIZE } from "@/constants";
+import { BadgeCriteriaKey } from "@/constants/badge";
+import { countBadges } from "../utils";
 
 interface GetUsersParams {
   page?: number;
@@ -185,11 +187,41 @@ export const getUserInfo = async (clerkId: string) => {
 
   const totalQuestions = await Question.countDocuments({ author: user._id });
   const totalAnswers = user.answers.length;
+  const questionAggregateResult = await Question.aggregate([
+    { $match: { author: user._id } },
+    { $project: { upvotes: { $size: "$upvotes" }, views: 1 } },
+    {
+      $group: {
+        _id: null,
+        totalUpvotes: { $sum: "$upvotes" },
+        totalViews: { $sum: "$views" },
+      },
+    },
+  ]);
+  const answerUpvotesResult = await Answer.aggregate([
+    { $match: { author: user._id } },
+    { $project: { upvotes: { $size: "$upvotes" } } },
+    { $group: { _id: null, totalUpvotes: { $sum: "$upvotes" } } },
+  ]);
+  const questionUpvotes = questionAggregateResult[0]?.totalUpvotes || 0;
+  const questionViews = questionAggregateResult[0]?.totalViews || 0;
+  const answerUpvotes = answerUpvotesResult[0]?.totalUpvotes || 0;
+
+  const criteria: Array<{ type: BadgeCriteriaKey; count: number }> = [
+    { type: "QUESTION_COUNT", count: totalQuestions },
+    { type: "ANSWER_COUNT", count: totalAnswers },
+    { type: "QUESTION_UPVOTES", count: questionUpvotes },
+    { type: "ANSWER_UPVOTES", count: answerUpvotes },
+    { type: "TOTAL_VIEWS", count: questionViews },
+  ];
+
+  const badges = countBadges(criteria);
 
   return {
     user,
     totalQuestions,
     totalAnswers,
+    badges,
   };
 };
 
