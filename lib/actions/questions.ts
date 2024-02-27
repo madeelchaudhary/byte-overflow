@@ -54,7 +54,7 @@ export async function createQuestion(params: CreateQuestionParams) {
 
     for (const tag of tags) {
       const tagDoc = await Tag.findOne({
-        name: { $regex: new RegExp(tag, "i") },
+        name: { $regex: `^${tag}$`, $options: "i" },
       });
       if (tagDoc) {
         tagDoc.questions.push(question._id);
@@ -188,7 +188,7 @@ export const editQuestion = async (params: EditQuestionParams) => {
 
     for (const tag of tags) {
       const tagDoc = await Tag.findOne({
-        name: { $regex: new RegExp(tag, "i") },
+        name: { $regex: `^${tag}$`, $options: "i" },
       });
       if (tagDoc) {
         if (!tagDoc.questions.includes(question._id)) {
