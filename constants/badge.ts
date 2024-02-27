@@ -25,3 +25,10 @@ export const BADGE_CRITERIA = {
     GOLD: 100000,
   },
 };
+
+export type BadgeCriteriaKey = keyof typeof BADGE_CRITERIA;
+export type Badges = {
+  BRONZE: number;
+  SILVER: number;
+  GOLD: number;
+};
