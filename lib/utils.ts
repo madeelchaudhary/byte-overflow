@@ -1,3 +1,4 @@
+import { BADGE_CRITERIA, BadgeCriteriaKey, Badges } from "@/constants/badge";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -78,4 +79,26 @@ export const generatePagination = (currentPage: number, totalPages: number) => {
     "...",
     totalPages,
   ];
+};
+
+export const countBadges = (
+  criteria: Array<{ type: BadgeCriteriaKey; count: number }>
+) => {
+  const badges: Badges = {
+    BRONZE: 0,
+    SILVER: 0,
+    GOLD: 0,
+  };
+
+  for (const { type, count } of criteria) {
+    if (count >= BADGE_CRITERIA[type].GOLD) {
+      badges.GOLD++;
+    } else if (count >= BADGE_CRITERIA[type].SILVER) {
+      badges.SILVER++;
+    } else if (count >= BADGE_CRITERIA[type].BRONZE) {
+      badges.BRONZE++;
+    }
+  }
+
+  return badges;
 };
