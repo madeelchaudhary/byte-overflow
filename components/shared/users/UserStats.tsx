@@ -1,3 +1,4 @@
+import { Badges } from "@/constants/badge";
 import { humanizeNumber } from "@/lib/utils";
 import Image from "next/image";
 import React from "react";
@@ -5,9 +6,10 @@ import React from "react";
 interface Props {
   totalQuestions: number;
   totalAnswers: number;
+  badges: Badges;
 }
 
-const UserStats = ({ totalAnswers, totalQuestions }: Props) => {
+const UserStats = ({ totalAnswers, totalQuestions, badges }: Props) => {
   return (
     <div className="mt-10">
       <h2 className="h3-semibold text-dark200_light900">Stats</h2>
@@ -30,17 +32,17 @@ const UserStats = ({ totalAnswers, totalQuestions }: Props) => {
 
         <StatCard
           title="Gold Badges"
-          value={0}
+          value={badges.GOLD}
           img="/assets/icons/gold-medal.svg"
         />
         <StatCard
           title="Silver Badges"
-          value={0}
+          value={badges.SILVER}
           img="/assets/icons/silver-medal.svg"
         />
         <StatCard
           title="Bronze Badges"
-          value={0}
+          value={badges.BRONZE}
           img="/assets/icons/bronze-medal.svg"
         />
       </div>

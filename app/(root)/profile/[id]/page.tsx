@@ -25,7 +25,7 @@ const page = async ({ params: { id }, searchParams }: Props) => {
 
   if (!result) return notFound();
 
-  const { user, totalQuestions, totalAnswers } = result;
+  const { user, totalQuestions, totalAnswers, badges } = result;
 
   return (
     <>
@@ -94,7 +94,11 @@ const page = async ({ params: { id }, searchParams }: Props) => {
         </div>
       </div>
 
-      <UserStats totalQuestions={totalQuestions} totalAnswers={totalAnswers} />
+      <UserStats
+        totalQuestions={totalQuestions}
+        totalAnswers={totalAnswers}
+        badges={badges}
+      />
 
       <div className="mt-10 flex gap-10">
         <ProfileTabs
