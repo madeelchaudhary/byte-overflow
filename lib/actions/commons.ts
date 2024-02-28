@@ -2,8 +2,14 @@
 
 import Answer from "@/db/answer.model";
 import Question from "@/db/question.model";
+import Interaction from "@/db/interaction.model";
 import Tag from "@/db/tag.model";
+import User from "@/db/user.model";
 import dbConnect from "../dbConnect";
+import { auth } from "@clerk/nextjs";
+import APIError from "../api-error";
+import { GENERATIONS_ALLOWED_PER_MONTH } from "@/constants";
+import showdown from "showdown";
 
 export const globalSearch = async (query: string, filter?: string) => {
   try {
@@ -46,16 +52,78 @@ export const globalSearch = async (query: string, filter?: string) => {
 
 export const generateAIAnswer = async (questionId: string) => {
   try {
+    const { userId } = auth();
+
+    if (!userId) {
+      throw new APIError("You are not authorized to perform this action.", 401);
+    }
+
+    const user = await User.findOne({ clerkId: userId });
+
+    if (!user) {
+      throw new APIError("User not found.", 404);
+    }
+
+    const generations = await Interaction.find({
+      user: user._id,
+      action: "generation",
+      createdAt: { $gte: new Date(new Date().setDate(1)) },
+    });
+
+    if (generations.length >= GENERATIONS_ALLOWED_PER_MONTH) {
+      throw new APIError(
+        "You have reached the maximum number of allowed answer generations for this month.",
+        400
+      );
+    }
+
+    const codeBlockExtension: showdown.ShowdownExtension = {
+      type: "output",
+      regex:
+        /<pre><code class="[\s\S]+?language-(\w+)">([\s\S]+?)<\/code><\/pre>/g,
+      replace: function (match: any, language: any, code: any) {
+        const preClass = `s-code-block language-${language}`;
+        const codeClass = `hljs language-${language}`;
+        return `<pre class="${preClass}"><code class="${codeClass}">${code}</code></pre>`;
+      },
+    };
+    const converter = new showdown.Converter({
+      openLinksInNewWindow: true,
+      extensions: [codeBlockExtension],
+    });
+    converter.setFlavor("ghost");
+
     const answerWith = process.env.GENERATE_ANSWER_WITH;
 
     if (answerWith === "gemini") {
-      return generateGeminiAnswer(questionId);
+      const result = await generateGeminiAnswer(questionId);
+
+      await Interaction.create({
+        user: user._id,
+        action: "generation",
+        question: questionId,
+      });
+
+      const content = converter.makeHtml(result.content);
+
+      return { content };
     } else if (answerWith === "openai") {
-      return generateOpenAIAnswer(questionId);
+      const result = await generateOpenAIAnswer(questionId);
+
+      await Interaction.create({
+        user: user._id,
+        action: "generation",
+        question: questionId,
+      });
+
+      const content = converter.makeHtml(result.content);
+
+      return { content };
     } else {
-      throw new Error("Answer generation service not found.");
+      throw new APIError("Answer generation service not found.", 404);
     }
   } catch (error) {
+    console.log(error);
     throw new Error("An error occurred while generating the answer.");
   }
 };
@@ -90,6 +158,8 @@ async function generateGeminiAnswer(questionId: string) {
                 Please provide an answer to the question.
 
                 For example, you can provide a code snippet, a link to a resource, or a brief explanation.
+
+                Output format: markdown or MD
               `,
               },
             ],
@@ -153,6 +223,8 @@ async function generateOpenAIAnswer(questionId: string) {
               Please provide an answer to the question.
 
               For example, you can provide a code snippet, a link to a resource, or a brief explanation.
+
+              Format: markdown
             `,
           },
         ],
