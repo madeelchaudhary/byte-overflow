@@ -17,9 +17,11 @@ import { useState } from "react";
 import Image from "next/image";
 import { useParams } from "next/navigation";
 import { createAnswer } from "@/lib/actions/answers";
+import { generateAIAnswer } from "@/lib/actions/commons";
 
-const AnswerForm = () => {
+const AnswerForm = ({ userId }: { userId: string | null }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmittingAI, setIsSubmittingAI] = useState(false);
   const params = useParams<{ id: string }>();
 
   const form = useForm<z.infer<typeof AnswerSchema>>({
@@ -30,6 +32,7 @@ const AnswerForm = () => {
   });
 
   async function onSubmit(data: z.infer<typeof AnswerSchema>) {
+    if (!userId) return;
     try {
       setIsSubmitting(true);
 
@@ -45,6 +48,18 @@ const AnswerForm = () => {
     }
   }
 
+  async function onGenerateAIAnswer() {
+    if (!userId) return;
+    try {
+      setIsSubmittingAI(true);
+      const data = await generateAIAnswer(params.id);
+      form.setValue("description", data.content);
+    } catch (error) {
+    } finally {
+      setIsSubmittingAI(false);
+    }
+  }
+
   return (
     <div className="mt-8">
       <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-center sm:gap-2">
@@ -52,7 +67,11 @@ const AnswerForm = () => {
           Your Answer Goes Here
         </h2>
 
-        <Button className="btn light-border-2 w-fit gap-1.5 rounded-md px-4 py-2.5 text-primary-500 shadow-none dark:bg-primary-500">
+        <Button
+          className="btn light-border-2 w-fit gap-1.5 rounded-md px-4 py-2.5 text-primary-500 shadow-none dark:bg-primary-500"
+          onClick={onGenerateAIAnswer}
+          disabled={isSubmitting || isSubmittingAI}
+        >
           <Image
             src={"/assets/icons/stars.svg"}
             alt="AI"
@@ -60,7 +79,7 @@ const AnswerForm = () => {
             height={18}
             className="mr-2"
           />
-          Generate AI Answer
+          {isSubmittingAI ? "Generating..." : "Generate AI Answer"}
         </Button>
       </div>
 
@@ -85,7 +104,7 @@ const AnswerForm = () => {
             <Button
               type="submit"
               className="primary-gradient w-fit text-light-900"
-              disabled={isSubmitting}
+              disabled={isSubmitting || isSubmittingAI}
             >
               {!isSubmitting ? "Submit" : "Submitting..."}
             </Button>

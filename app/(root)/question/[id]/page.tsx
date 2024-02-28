@@ -125,7 +125,7 @@ const page = async ({ params: { id }, searchParams }: Props) => {
         searchParams={searchParams}
       />
 
-      <AnswerForm />
+      <AnswerForm userId={userId} />
     </>
   );
 };
