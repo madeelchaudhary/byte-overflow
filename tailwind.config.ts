@@ -36,6 +36,7 @@ const config: Config = {
           500: "#7B8EC8",
           400: "#858EAD",
         },
+        muted: "hsl(210 40% 96.1%)",
         "accent-blue": "#1DA1F2",
       },
       fontFamily: {
