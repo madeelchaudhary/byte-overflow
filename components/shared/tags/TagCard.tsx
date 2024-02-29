@@ -18,13 +18,13 @@ const TagCard = ({ _id, name, description, questionsCount }: TagCardProps) => {
         <div className="background-light800_dark400 w-fit rounded-sm px-5 py-1.5">
           <h3 className="text-dark300_light900 paragraph-semibold">{name}</h3>
         </div>
-        <p className="text-dark400_light500 small-medium  mt-3.5">
+        <p className="text-dark400_light500 small-medium mt-3.5">
           <span className="body-semibold primary-text-gradient mr-2.5">
             {questionsCount}+
           </span>{" "}
           Questions
         </p>
-        <p className="text-dark400_light500 small-medium  mt-3.5">
+        <p className="text-dark400_light500 small-medium mt-3.5 line-clamp-1">
           {description}
         </p>
       </div>
