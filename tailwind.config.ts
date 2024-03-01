@@ -1,4 +1,5 @@
 import type { Config } from "tailwindcss";
+import colors from "tailwindcss/colors";
 
 const config: Config = {
   darkMode: ["class"],
@@ -36,7 +37,12 @@ const config: Config = {
           500: "#7B8EC8",
           400: "#858EAD",
         },
-        muted: "hsl(210 40% 96.1%)",
+        muted: "hsl(--muted)",
+        "muted-foreground": "hsl(var(--muted-foreground))",
+        destructive: "hsl(var(--destructive))",
+        "destructive-foreground": "hsl(var(--destructive-foreground))",
+        foreground: "hsl(var(--foreground))",
+        background: "hsl(var(--background))",
         "accent-blue": "#1DA1F2",
       },
       fontFamily: {
