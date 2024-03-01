@@ -9,6 +9,7 @@ import { z } from "zod";
 import { ProfileSchema } from "../validations";
 import { redirect } from "next/navigation";
 import { UserData } from "../types";
+import { auth, clerkClient } from "@clerk/nextjs";
 
 interface CreateUserParams {
   clerkId: string;
@@ -167,11 +168,26 @@ export const editProfile = async ({
       throw new APIError("Invalid data", 400);
     }
 
+    const { userId: clerkId } = auth();
+
+    if (!clerkId) {
+      throw new APIError("You must be logged in to edit your profile", 401);
+    }
+
     const user = await User.findById(userId);
 
     if (!user) {
       throw new APIError("User not found", 404);
     }
+
+    if (user.clerkId !== clerkId) {
+      throw new APIError("You are not authorized to perform this action", 403);
+    }
+
+    await clerkClient.users.updateUser(user.clerkId, {
+      firstName: name.split(" ")[0],
+      lastName: name.split(" ")[1],
+    });
 
     user.profile.name = name;
     user.profile.portfolio = portfolio;
