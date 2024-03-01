@@ -20,6 +20,7 @@ import { createQuestion, editQuestion } from "@/lib/actions/questions";
 import { QuestionSchema } from "@/lib/validations";
 import Image from "next/image";
 import { useState } from "react";
+import { toast } from "@/components/ui/use-toast";
 
 interface QuestionFormProps {
   type?: "ask" | "edit";
@@ -47,11 +48,22 @@ const QuestionForm = ({ type = "ask", question }: QuestionFormProps) => {
   async function onSubmit(data: z.infer<typeof QuestionSchema>) {
     try {
       setIsSubmitting(true);
-      if (type === "ask") await createQuestion(data);
-      if (type === "edit") {
-        await editQuestion({ questionId: question!._id, ...data });
+      let result: void | { error: string; status: number };
+      if (type === "ask") result = await createQuestion(data);
+      if (type === "edit")
+        result = await editQuestion({ questionId: question!._id, ...data });
+
+      if (result! && result.error) {
+        toast({
+          title: result.error,
+          variant: "destructive",
+        });
       }
     } catch (error) {
+      toast({
+        title: "An error occurred. Please try again later.",
+        variant: "destructive",
+      });
     } finally {
       setIsSubmitting(false);
     }
