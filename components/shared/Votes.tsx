@@ -11,6 +11,7 @@ import {
 } from "@/lib/actions/votes";
 import { saveQuestion } from "@/lib/actions/user";
 import { viewQuestion } from "@/lib/actions/interaction";
+import { toast } from "../ui/use-toast";
 
 interface Props {
   type: "question" | "answer";
@@ -33,33 +34,57 @@ const Votes = ({
   const hasDownvoted = downvotes.includes(userId || "");
 
   async function handleVote(action: "upvote" | "downvote") {
-    if (!userId) return;
+    if (!userId)
+      return toast({
+        title: "You need to be logged in to vote",
+        variant: "destructive",
+      });
+
     try {
+      let result: { error: string; status: number } | void;
       if (type === "question") {
         if (action === "upvote") {
-          await upvoteQuestion(itemId, userId);
+          result = await upvoteQuestion(itemId, userId);
         }
 
         if (action === "downvote") {
-          await downvoteQuestion(itemId, userId);
+          result = await downvoteQuestion(itemId, userId);
         }
       } else {
         if (action === "upvote") {
-          await upvoteAnswer(itemId, userId);
+          result = await upvoteAnswer(itemId, userId);
         }
 
         if (action === "downvote") {
-          await downvoteAnswer(itemId, userId);
+          result = await downvoteAnswer(itemId, userId);
         }
       }
-    } catch (error) {}
+
+      if (result! && result.error) {
+        return toast({ title: result.error, variant: "destructive" });
+      }
+    } catch (error) {
+      toast({ title: "Something went wrong!", variant: "destructive" });
+    }
   }
 
   async function handleSave() {
-    if (!userId) return;
+    if (!userId) {
+      return toast({
+        title: "You need to be logged in to save",
+        variant: "destructive",
+      });
+    }
+
     try {
-      await saveQuestion(itemId, userId);
-    } catch (error) {}
+      const result = await saveQuestion(itemId, userId);
+
+      if (result && result.error) {
+        return toast({ title: result.error, variant: "destructive" });
+      }
+    } catch (error) {
+      toast({ title: "Something went wrong!", variant: "destructive" });
+    }
   }
 
   useEffect(() => {
