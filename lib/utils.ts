@@ -102,3 +102,18 @@ export const countBadges = (
 
   return badges;
 };
+
+export function getAIAnswerPrompt(title: string, description: string) {
+  return `
+  Below is the question that needs to be answered:
+
+  Title: ${title}
+  Explanation in WYSIWYG format: ${description}
+
+  Please provide an answer to the question.
+
+  For example, you can provide a code snippet, a link to a resource, or a brief explanation.
+
+  Output format: markdown or MD
+`;
+}
