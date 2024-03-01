@@ -86,7 +86,6 @@ export async function createQuestion(params: CreateQuestionParams) {
       $inc: { "profile.reputation": ASK_QUESTION_REPUTATION },
     });
 
-    console.log("Creating question...");
     await question.save();
   } catch (error) {
     if (error instanceof APIError) {
