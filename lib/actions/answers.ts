@@ -18,7 +18,6 @@ type CreateAnswerParams = z.infer<typeof AnswerSchema> & {
 };
 
 export async function createAnswer(params: CreateAnswerParams) {
-  let questionIdParam: string;
   try {
     await dbConnect();
 
@@ -29,7 +28,6 @@ export async function createAnswer(params: CreateAnswerParams) {
     }
 
     const { description, questionId } = params;
-    questionIdParam = questionId;
 
     const { userId } = auth();
 
@@ -65,16 +63,15 @@ export async function createAnswer(params: CreateAnswerParams) {
       $inc: { "profile.reputation": ANSWER_QUESTION_REPUTATION },
     });
 
-    console.log("Creating answer...");
     await answer.save();
+
+    revalidatePath(`/question/${questionId}`);
   } catch (error) {
     if (error instanceof APIError) {
       return { error: error.message, status: error.code };
     }
     return { error: "Internal Server Error", status: 500 };
   }
-
-  revalidatePath(`/question/${questionIdParam}`);
 }
 
 export const deleteAnswer = async (answerId: string, path?: string) => {
