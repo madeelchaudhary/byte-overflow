@@ -19,6 +19,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { UserData } from "@/lib/types";
 import { ProfileSchema } from "@/lib/validations";
 import { editProfile } from "@/lib/actions/user";
+import { toast } from "@/components/ui/use-toast";
 
 interface Props {
   user: UserData;
@@ -40,8 +41,18 @@ const ProfileForm = ({ user }: Props) => {
   async function onSubmit(data: z.infer<typeof ProfileSchema>) {
     try {
       setIsSubmitting(true);
-      await editProfile({ userId: user._id, ...data });
+      const result = await editProfile({ userId: user._id, ...data });
+      if (result && result.error) {
+        toast({
+          title: result.error,
+          variant: "destructive",
+        });
+      }
     } catch (error) {
+      toast({
+        title: "An error occurred. Please try again later.",
+        variant: "destructive",
+      });
     } finally {
       setIsSubmitting(false);
     }
