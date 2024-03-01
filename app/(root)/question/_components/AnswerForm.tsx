@@ -18,6 +18,7 @@ import Image from "next/image";
 import { useParams } from "next/navigation";
 import { createAnswer } from "@/lib/actions/answers";
 import { generateAIAnswer } from "@/lib/actions/commons";
+import { toast } from "@/components/ui/use-toast";
 
 const AnswerForm = ({ userId }: { userId: string | null }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -32,29 +33,49 @@ const AnswerForm = ({ userId }: { userId: string | null }) => {
   });
 
   async function onSubmit(data: z.infer<typeof AnswerSchema>) {
-    if (!userId) return;
+    if (!userId) return toast({ title: "You must be logged in to answer" });
     try {
       setIsSubmitting(true);
 
-      await createAnswer({
+      const result = await createAnswer({
         description: data.description,
         questionId: params.id,
       });
 
+      if (result && result.error) {
+        return toast({
+          title: result.error,
+          variant: "destructive",
+        });
+      }
+
       form.reset();
+      form.clearErrors();
     } catch (error) {
+      toast({
+        title: "An error occurred. Please try again later.",
+        variant: "destructive",
+      });
     } finally {
       setIsSubmitting(false);
     }
   }
 
   async function onGenerateAIAnswer() {
-    if (!userId) return;
+    if (!userId) return toast({ title: "You must be logged in to answer" });
     try {
       setIsSubmittingAI(true);
       const data = await generateAIAnswer(params.id);
-      form.setValue("description", data.content);
+
+      if (data.error)
+        return toast({ title: data.error, variant: "destructive" });
+
+      form.setValue("description", data.content!);
     } catch (error) {
+      toast({
+        title: "An error occurred. Please try again later.",
+        variant: "destructive",
+      });
     } finally {
       setIsSubmittingAI(false);
     }
