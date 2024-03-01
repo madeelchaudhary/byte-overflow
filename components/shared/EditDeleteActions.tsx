@@ -6,6 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { deleteAnswer } from "@/lib/actions/answers";
 import { deleteQuestion } from "@/lib/actions/questions";
 import { Button } from "../ui/button";
+import { toast } from "../ui/use-toast";
 
 interface Props {
   type: "question" | "answer";
@@ -17,12 +18,27 @@ const EditDeleteActions = ({ type, itemId }: Props) => {
   const router = useRouter();
 
   async function handleDelete() {
-    if (type === "question") {
-      // delete question
-      await deleteQuestion(itemId, pathname);
-    } else {
-      // delete answer
-      await deleteAnswer(itemId, pathname);
+    try {
+      let result: { error: string; status: number } | void;
+      if (type === "question") {
+        // delete question
+        result = await deleteQuestion(itemId, pathname);
+      } else {
+        // delete answer
+        result = await deleteAnswer(itemId, pathname);
+      }
+
+      if (result! && result.error) {
+        toast({
+          title: result.error,
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "An error occurred. Please try again later.",
+        variant: "destructive",
+      });
     }
   }
 
