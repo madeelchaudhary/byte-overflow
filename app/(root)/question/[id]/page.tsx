@@ -12,6 +12,7 @@ import Link from "next/link";
 import AllAnswers from "../_components/AllAnswers";
 import AnswerForm from "../_components/AnswerForm";
 import { notFound } from "next/navigation";
+import { Metadata } from "next";
 
 const HtmlParser = dynamic(() => import("@/components/shared/HtmlParser"), {
   ssr: false,
@@ -131,3 +132,27 @@ const page = async ({ params: { id }, searchParams }: Props) => {
 };
 
 export default page;
+
+export const generateMetadata = async ({
+  params: { id },
+}: Props): Promise<Metadata> => {
+  const result = await getQuestionById(id);
+
+  if (!result) {
+    return notFound();
+  }
+
+  const { question } = result;
+
+  const shortDescription = question.description.slice(0, 160);
+
+  return {
+    title: question.title,
+    description: shortDescription,
+    keywords: question.tags.map((tag: any) => tag.name),
+    authors: {
+      name: question.author.profile.name,
+      url: `/profile/${question.author.clerkId}`,
+    },
+  };
+};
