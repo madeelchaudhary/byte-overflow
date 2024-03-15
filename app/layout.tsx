@@ -19,6 +19,11 @@ const spaceGrotesk = Space_Grotesk({
 export const metadata: Metadata = {
   title: "Byte Overflow | Stack Overflow for Developers",
   description: "Stack Overflow for Developers",
+  authors: { name: "M Adeel", url: "https://github.com/madeelchaudhary" },
+  creator: "M Adeel",
+  robots: { index: true, follow: true },
+  keywords: ["Stack Overflow", "Developers", "Questions", "Answers"],
+  applicationName: "Byte Overflow",
 };
 
 export default function RootLayout({
