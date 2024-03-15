@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { HomePageFilters } from "@/constants/filters";
 import { getQuestions } from "@/lib/data/questions";
 import PaginationMenu from "@/components/shared/PaginationMenu";
+import { Metadata } from "next";
 
 interface Props {
   searchParams: {
@@ -71,3 +72,8 @@ export default async function Home({ searchParams }: Props) {
     </>
   );
 }
+
+export const metadata: Metadata = {
+  title: "Byte Overflow | Home",
+  description: "Ask questions and get answers from the community",
+};
