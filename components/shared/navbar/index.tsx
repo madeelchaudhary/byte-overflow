@@ -5,6 +5,7 @@ import React from "react";
 import ThemeToggle from "./ThemeToggle";
 import MobileNav from "./MobileNav";
 import GlobalSearch from "../search/GlobalSearch";
+import { GitHubLogoIcon } from "@radix-ui/react-icons";
 
 const Navbar = () => {
   return (
@@ -23,6 +24,13 @@ const Navbar = () => {
       </Link>
       <GlobalSearch />
       <div className="flex-between gap-5">
+        <Link
+          href="https://github.com/madeelchaudhary/byte-overflow"
+          target="_blank"
+          className="hidden items-center sm:flex"
+        >
+          <GitHubLogoIcon className="h-6 w-6 text-dark-300 dark:text-light-900" />
+        </Link>
         <ThemeToggle />
         <SignedIn>
           <UserButton
