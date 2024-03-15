@@ -5,6 +5,7 @@ import LocalSearch from "@/components/shared/search/LocalSearch";
 import UserCard from "@/components/shared/users/UserCard";
 import { UserFilters } from "@/constants/filters";
 import { getUsers } from "@/lib/data/user";
+import { Metadata } from "next";
 
 interface Props {
   searchParams: {
@@ -56,3 +57,9 @@ const page = async ({ searchParams }: Props) => {
 };
 
 export default page;
+
+export const metadata: Metadata = {
+  title: "Community | Byte Overflow",
+  description: "Meet the amazing people of Byte Overflow",
+  keywords: ["Community", "Developers", "Users"],
+};
