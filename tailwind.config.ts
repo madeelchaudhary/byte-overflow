@@ -37,7 +37,7 @@ const config: Config = {
           500: "#7B8EC8",
           400: "#858EAD",
         },
-        muted: "hsl(--muted)",
+        muted: "hsl(var(--muted))",
         "muted-foreground": "hsl(var(--muted-foreground))",
         destructive: "hsl(var(--destructive))",
         "destructive-foreground": "hsl(var(--destructive-foreground))",
