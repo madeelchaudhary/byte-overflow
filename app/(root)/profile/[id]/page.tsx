@@ -8,6 +8,7 @@ import ProfileTabs from "@/components/shared/users/ProfileTabs";
 import UserStats from "@/components/shared/users/UserStats";
 import { Button } from "@/components/ui/button";
 import { getUserInfo } from "@/lib/data/user";
+import { Metadata } from "next";
 
 interface Props {
   params: {
@@ -112,3 +113,19 @@ const page = async ({ params: { id }, searchParams }: Props) => {
 };
 
 export default page;
+
+export const generateMetadata = async ({
+  params,
+}: Props): Promise<Metadata> => {
+  const result = await getUserInfo(params.id);
+
+  if (!result) return notFound();
+
+  const { user } = result;
+
+  return {
+    title: `Profile | ${user.profile.name}`,
+    description: `Byte Overflow profile of ${user.profile.name}. Ask questions and get answers from ${user.profile.name}.`,
+    robots: { index: true, follow: true },
+  };
+};
