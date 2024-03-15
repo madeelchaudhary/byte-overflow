@@ -61,27 +61,29 @@ const QuestionCard = ({
           href={`/profile/${author.clerkId}`}
           isAuthor
         />
-        <Metric
-          textStyles="small-medium text-dark400_light800"
-          img="/assets/icons/like.svg"
-          alt="Upvotes"
-          text="Upvotes"
-          value={humanizeNumber(upvotes.length)}
-        />
-        <Metric
-          textStyles="small-medium text-dark400_light800"
-          img="/assets/icons/message.svg"
-          alt="message"
-          text="Answers"
-          value={humanizeNumber(answers.length)}
-        />
-        <Metric
-          textStyles="small-medium text-dark400_light800"
-          img="/assets/icons/eye.svg"
-          alt="eye"
-          text="Views"
-          value={humanizeNumber(views)}
-        />
+        <div className="flex flex-wrap items-center gap-3 md:gap-5">
+          <Metric
+            textStyles="small-medium text-dark400_light800"
+            img="/assets/icons/like.svg"
+            alt="Upvotes"
+            text="Upvotes"
+            value={humanizeNumber(upvotes.length)}
+          />
+          <Metric
+            textStyles="small-medium text-dark400_light800"
+            img="/assets/icons/message.svg"
+            alt="message"
+            text="Answers"
+            value={humanizeNumber(answers.length)}
+          />
+          <Metric
+            textStyles="small-medium text-dark400_light800"
+            img="/assets/icons/eye.svg"
+            alt="eye"
+            text="Views"
+            value={humanizeNumber(views)}
+          />
+        </div>
       </div>
     </div>
   );
